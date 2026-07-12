@@ -42,16 +42,16 @@ export const AccessTokenService = {
     return accessToken;
   },
 
-  async delete(actionId: string): Promise<boolean> {
+  async archive(accessTokenId: string): Promise<boolean> {
     const now = dateISO()
     try {
       await db
-        .update(actionTable)
+        .update(accessTokenTable)
         .set({
-          deletedAt: now,
+          archivedAt: now,
         })
         .where(
-          eq(actionTable.id, actionId),
+          eq(accessTokenTable.id, accessTokenId),
         )
       return true
     }
