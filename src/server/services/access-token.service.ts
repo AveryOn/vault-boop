@@ -1,7 +1,6 @@
 import { db } from "~/server/database/client";
-import { accessTokenTable, actionTable } from "~/server/database/schema";
+import { accessTokenTable } from "~/server/database/schema";
 import { eq } from "drizzle-orm";
-import type { Action, CreateActionDto } from "~/shared/dto/action.dto";
 import { dateISO } from "~/shared/utils/datetime";
 import type { AccessToken, CreateAccessTokenDto, CreateAccessTokenSecureDto } from "~/shared/dto/access-token.dto";
 
