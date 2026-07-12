@@ -78,7 +78,7 @@ function submit(): void {
     return
   }
 
-  toast.success('Form is valid')
+  toast.success('Success!')
 
   console.debug(result.data)
 }
@@ -88,7 +88,7 @@ function submit(): void {
   <section class="mx-auto w-[360px] h-full flex items-center justify-center py-10">
     <article class="overlay-card">
       <form class="w-[360px] h-[600px] flex flex-col px-[24px] py-[12px] gap-[28px]" @submit.prevent="submit">
-        <h1 class="text-[36px]">Sign Up</h1>
+        <h1 class="text-[36px] ml-auto">Sign Up</h1>
         <InputUI v-model="formData.username.value" placeholder="Username" :size="'large'" type="username"
           label="Username" :error="formData.username.error" @input="() => undoError('username')" />
 

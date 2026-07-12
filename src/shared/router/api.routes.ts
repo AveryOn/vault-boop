@@ -3,6 +3,9 @@ export const apiRoutes = {
     Health: '/api/health',
     Projects: '/api/projects',
     Articles: '/api/articles',
+
+    SignIn: '/api/auth/signin',
+    SignUp: '/api/auth/signup',
   },
 
   admin: {
