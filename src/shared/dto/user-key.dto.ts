@@ -3,6 +3,13 @@ import type { userKeyTable } from '~/server/database/schema'
 
 export type UserKey = typeof userKeyTable.$inferSelect
 export type UserKeyInput = typeof userKeyTable.$inferInsert
+export type UserKeySafety = Omit<
+  | UserKey
+  | 'userId'
+  | 'deletedAt',
+  | 'keyHash'
+>
+
 
 export const createUserKeyDto = z.object({
   name: z.string().trim().min(3),
@@ -10,7 +17,7 @@ export const createUserKeyDto = z.object({
 })
 export type CreateUserKeyDto = z.infer<typeof createUserKeyDto>
 
-export type CreateUserKeyResponse = Omit<UserKey, 'masterPasswordHash' | 'username'>
+export type CreateUserKeyResponse = UserKeySafety
 
 export const updateUserKeyDto = z.object({
   name: z.string().trim().min(3).optional(),
@@ -18,4 +25,4 @@ export const updateUserKeyDto = z.object({
 })
 
 export type UpdateUserKeyDto = z.infer<typeof updateUserKeyDto>
-export type UpdateUserKeyResponse = Omit<UserKey, 'masterPasswordHash' | 'username'>
+export type UpdateUserKeyResponse = UserKeySafety
