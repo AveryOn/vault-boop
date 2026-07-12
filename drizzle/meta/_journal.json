@@ -22,6 +22,13 @@
       "when": 1783860571430,
       "tag": "0002_easy_cargill",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1783860595981,
+      "tag": "0003_massive_angel",
+      "breakpoints": true
     }
   ]
 }

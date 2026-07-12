@@ -11,10 +11,7 @@ export type CreateActionDto = z.infer<typeof createActionDto>
 export type CreateActionResponse = Action
 
 export const updateActionDto = z.object({
-  username: z.string().trim().min(3).optional(),
-  firstName: z.string().trim().min(3).optional(),
-  lastName: z.string().trim().min(3).optional(),
-  password: z.string().trim().min(8).optional(),
+  name: z.string().trim().min(3),
 })
 
 export type UpdateActionDto = z.infer<typeof updateActionDto>
