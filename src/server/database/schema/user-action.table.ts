@@ -14,6 +14,4 @@ export const userActionTable = sqliteTable('user_action', {
     .references(() => userTable.id, { onDelete: 'cascade' }),
 
   createdAt: timestamp('created_at', true).notNull(),
-  updatedAt: timestamp('updated_at', true).notNull(),
-  deletedAt: timestamp('deleted_at'),
 })

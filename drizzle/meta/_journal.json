@@ -36,6 +36,13 @@
       "when": 1783861084220,
       "tag": "0004_wooden_starfox",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1783861292146,
+      "tag": "0005_third_bloodstrike",
+      "breakpoints": true
     }
   ]
 }
