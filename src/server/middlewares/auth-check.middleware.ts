@@ -5,14 +5,16 @@ import { AccessTokenService } from '~/server/services'
 
 export const AuthCheckMiddleware = defineMiddleware(
   async (ctx, next) => {
-    // const url = new URL(ctx.request.url)
+    const url = new URL(ctx.request.url)
 
     const logger = new Logger('MIDDLEWARE:AuthCheck:RUN')
     const accessToken = ctx.cookies.get(CookieName['accessToken'])?.value
 
     if (!accessToken) {
       logger.warn('Access Token is not found!')
-      return ctx.redirect('/auth')
+      if (!url.pathname.startsWith('/auth')) {
+        return ctx.redirect('/auth')
+      }
     }
 
 
