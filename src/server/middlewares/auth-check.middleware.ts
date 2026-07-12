@@ -2,19 +2,19 @@ import { defineMiddleware } from 'astro:middleware'
 import { CookieName } from '~/shared/const'
 import { Logger } from '~/shared/logger/logger.client'
 import { AccessTokenService } from '~/server/services'
+import { clientRoutes } from '~/shared/router/client.routes'
 
 export const AuthCheckMiddleware = defineMiddleware(
   async (ctx, next) => {
     const url = new URL(ctx.request.url)
 
     const logger = new Logger('MIDDLEWARE:AuthCheck:RUN')
-    const accessToken = ctx.cookies.get(CookieName['accessToken'])?.value
+    // const accessToken = ctx.cookies.get(CookieName['accessToken'])?.value
+    const accessToken = 'asdasd'
 
     if (!accessToken) {
       logger.warn('Access Token is not found!')
-      if (!url.pathname.startsWith('/auth')) {
-        return ctx.redirect('/auth')
-      }
+      return ctx.redirect(clientRoutes.SignIn)
     }
 
 

@@ -1,0 +1,12 @@
+---
+import Layout from '~/client/layouts/Layout.astro'
+import IndexHeader from '~/client/components/common/IndexHeader.vue'
+import IndexFooter from '~/client/components/common/IndexFooter.vue'
+import SignInView from '~/client/components/vault-auth/SignInView.vue'
+---
+
+<Layout title={'PORTFOLIO--ADMIN'}>
+  <IndexHeader client:only="vue" slot="header" enableMenu={false} />
+  <SignInView client:only="vue" slot="main" />
+  <IndexFooter />
+</Layout>

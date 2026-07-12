@@ -4,6 +4,9 @@
 <template>
   <section class="mx-auto w-full max-w-[1120px] py-10">
     <article class="resume-card">
+      <form @submit.prevent>
+
+      </form>
     </article>
   </section>
 </template>
