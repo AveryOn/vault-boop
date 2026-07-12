@@ -1,19 +1,22 @@
-import { db } from "~/server/database/client";
-import { actionTable } from "../database/schema";
+import { db, type DatabaseTransaction } from "~/server/database/client";
+import { actionTable } from "~/server/database/schema";
 import { eq } from "drizzle-orm";
 import type { Action, CreateActionDto } from "~/shared/dto/action.dto";
 import { dateISO } from "~/shared/utils/datetime";
+import { SelectDatabaseAdapter } from "~/server/database/helpers";
 
 
 export const ActionService = {
-  async getList(): Promise<Action[]> {
-    return await db
+  async getList(tx?: DatabaseTransaction): Promise<Action[]> {
+    const database = SelectDatabaseAdapter(db, tx)
+    return await database
       .select()
       .from(actionTable)
   },
 
-  async getById(actionId: string): Promise<Action | null> {
-    const [action] = await db
+  async getById(actionId: string, tx?: DatabaseTransaction): Promise<Action | null> {
+    const database = SelectDatabaseAdapter(db, tx)
+    const [action] = await database
       .select()
       .from(actionTable)
       .where(
@@ -23,9 +26,22 @@ export const ActionService = {
     return action ?? null
   },
 
-  async create(dto: CreateActionDto): Promise<Action> {
+  async getByName(name: string, tx?: DatabaseTransaction): Promise<Action | null> {
+    const database = SelectDatabaseAdapter(db, tx)
+    const [action] = await database
+      .select()
+      .from(actionTable)
+      .where(
+        eq(actionTable.name, name),
+      )
+
+    return action ?? null
+  },
+
+  async create(dto: CreateActionDto, tx?: DatabaseTransaction): Promise<Action> {
+    const database = SelectDatabaseAdapter(db, tx)
     const now = dateISO()
-    const [action] = await db
+    const [action] = await database
       .insert(actionTable)
       .values({
         name: dto.name,
@@ -38,10 +54,11 @@ export const ActionService = {
     return action;
   },
 
-  async delete(actionId: string): Promise<boolean> {
+  async delete(actionId: string, tx?: DatabaseTransaction): Promise<boolean> {
+    const database = SelectDatabaseAdapter(db, tx)
     const now = dateISO()
     try {
-      await db
+      await database
         .update(actionTable)
         .set({
           deletedAt: now,

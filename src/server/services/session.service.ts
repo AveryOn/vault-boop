@@ -1,18 +1,42 @@
-import type { Session, TerminateAllSessionsDto } from "~/shared/dto/session.dto";
-import { db } from "~/server/database/client";
+import type { CreateSessionDto, Session, TerminateAllSessionsDto } from "~/shared/dto/session.dto";
+import { db as database, type DatabaseTransaction } from "~/server/database/client";
 import { sessionTable } from "../database/schema";
 import { eq } from "drizzle-orm";
 import { SessionStatus } from "~/shared/const";
+import { dateISO, getExpiresAt } from "~/shared/utils/datetime";
+import { serverEnv as env } from "~/server/config/env";
+import { SelectDatabaseAdapter } from "~/server/database/helpers";
 
 
 export const SessionService = {
-  async getList(): Promise<Session[]> {
+  async create(dto: CreateSessionDto, tx?: DatabaseTransaction): Promise<Session> {
+    const db = SelectDatabaseAdapter(database, tx)
+    const now = dateISO()
+    const [session] = await db
+      .insert(sessionTable)
+      .values({
+        accessTokenId: null,
+        createdAt: now,
+        expiresAt: getExpiresAt(env.SESSION_TTL, new Date(now)),
+        lastUsedAt: now,
+        lastUserActionId: dto.lastUserActionId,
+        userId: dto.userId,
+        status: SessionStatus.PENDING,
+      })
+      .returning()
+
+    return session
+  },
+
+  async getList(tx?: DatabaseTransaction): Promise<Session[]> {
+    const db = SelectDatabaseAdapter(database, tx)
     return await db
       .select()
       .from(sessionTable)
   },
 
-  async getById(sessionId: string): Promise<Session | null> {
+  async getById(sessionId: string, tx?: DatabaseTransaction): Promise<Session | null> {
+    const db = SelectDatabaseAdapter(database, tx)
     const [session] = await db
       .select()
       .from(sessionTable)
@@ -23,7 +47,8 @@ export const SessionService = {
     return session ?? null
   },
 
-  async getByUserId(userId: string): Promise<Session | null> {
+  async getByUserId(userId: string, tx?: DatabaseTransaction): Promise<Session | null> {
+    const db = SelectDatabaseAdapter(database, tx)
     const [session] = await db
       .select()
       .from(sessionTable)
@@ -34,7 +59,8 @@ export const SessionService = {
     return session ?? null
   },
 
-  async getByAccessTokenId(accessTokenId: string): Promise<Session | null> {
+  async getByAccessTokenId(accessTokenId: string, tx?: DatabaseTransaction): Promise<Session | null> {
+    const db = SelectDatabaseAdapter(database, tx)
     const [session] = await db
       .select()
       .from(sessionTable)
@@ -45,8 +71,9 @@ export const SessionService = {
   },
 
   /** Принудительное завершение всех сессий для пользователя */
-  async terminateAllSession(dto: TerminateAllSessionsDto): Promise<boolean> {
+  async terminateAllSession(dto: TerminateAllSessionsDto, tx?: DatabaseTransaction): Promise<boolean> {
     try {
+      const db = SelectDatabaseAdapter(database, tx)
       await db
         .update(sessionTable)
         .set({
@@ -63,8 +90,9 @@ export const SessionService = {
     }
   },
 
-  async terminateSession(sessionId: string): Promise<boolean> {
+  async terminateSession(sessionId: string, tx?: DatabaseTransaction): Promise<boolean> {
     try {
+      const db = SelectDatabaseAdapter(database, tx)
       await db
         .update(sessionTable)
         .set({

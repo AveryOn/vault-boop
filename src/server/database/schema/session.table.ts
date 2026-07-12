@@ -11,7 +11,6 @@ export const sessionTable = sqliteTable('session', {
     .references(() => userTable.id, { onDelete: 'cascade' }),
 
   accessTokenId: text('access_token_id')
-    .notNull()
     .references(() => userTable.id, { onDelete: 'cascade' }),
 
   lastUserActionId: text('last_user_action_id')

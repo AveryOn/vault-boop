@@ -35,52 +35,67 @@ const getKeyMap = {
 type GetKeyType = keyof typeof getKeyMap
 
 
-export function encryptData(value: string, type: GetKeyType): string {
-  const iv = crypto.randomBytes(12)
-  const cipher = crypto.createCipheriv(
-    env.CIPHER_ALGORITHM as CipherGCMTypes,
-    getKeyMap[type](),
-    iv
-  )
+export async function encryptData(value: string, type: GetKeyType): Promise<string> {
+  return await new Promise((resolve, reject) => {
+    try {
+      const iv = crypto.randomBytes(12)
+      const cipher = crypto.createCipheriv(
+        env.CIPHER_ALGORITHM as CipherGCMTypes,
+        getKeyMap[type](),
+        iv
+      )
 
-  const encrypted = Buffer.concat([
-    cipher.update(value, 'utf8'),
-    cipher.final(),
-  ])
+      const encrypted = Buffer.concat([
+        cipher.update(value, 'utf8'),
+        cipher.final(),
+      ])
 
-  const authTag = cipher.getAuthTag()
+      const authTag = cipher.getAuthTag()
 
-  return [
-    iv.toString('base64'),
-    authTag.toString('base64'),
-    encrypted.toString('base64'),
-  ].join(':')
+      return resolve(
+        [
+          iv.toString('base64'),
+          authTag.toString('base64'),
+          encrypted.toString('base64'),
+        ].join(':')
+      )
+    } catch (err) {
+      console.error(err)
+      reject(err)
+    }
+  })
 }
 
+export async function decryptData(value: string, type: GetKeyType): Promise<string> {
+  return await new Promise((resolve, reject) => {
+    try {
+      const [ivBase64, authTagBase64, encryptedBase64] = value.split(':')
 
-export function decryptData(value: string, type: GetKeyType): string {
-  const [ivBase64, authTagBase64, encryptedBase64] = value.split(':')
+      if (!ivBase64 || !authTagBase64 || !encryptedBase64) {
+        throw new Error('Invalid encrypted value')
+      }
 
-  if (!ivBase64 || !authTagBase64 || !encryptedBase64) {
-    throw new Error('Invalid encrypted value')
-  }
+      const decipher = crypto.createDecipheriv(
+        env.CIPHER_ALGORITHM as CipherGCMTypes,
+        getKeyMap[type](),
+        Buffer.from(ivBase64, 'base64'),
+      )
 
+      decipher.setAuthTag(Buffer.from(authTagBase64, 'base64'))
 
-  const decipher = crypto.createDecipheriv(
-    env.CIPHER_ALGORITHM as CipherGCMTypes,
-    getKeyMap[type](),
-    Buffer.from(ivBase64, 'base64'),
-  )
+      const decrypted = Buffer
+        .concat([
+          decipher.update(Buffer.from(encryptedBase64, 'base64')),
+          decipher.final(),
+        ])
 
-  decipher.setAuthTag(Buffer.from(authTagBase64, 'base64'))
+      return resolve(decrypted.toString('utf8'))
+    } catch (err) {
+      console.error(err)
+      reject(err)
+    }
+  })
 
-  const decrypted = Buffer
-    .concat([
-      decipher.update(Buffer.from(encryptedBase64, 'base64')),
-      decipher.final(),
-    ])
-
-  return decrypted.toString('utf8')
 }
 
 const algorithmMap = {

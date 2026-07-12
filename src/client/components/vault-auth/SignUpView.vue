@@ -4,6 +4,7 @@ import { z } from 'zod'
 import InputUI from '~/client/components/shared/InputUI.vue'
 import ButtonUI from '~/client/components/shared/ButtonUI.vue'
 import { useToast } from '~/client/composables/useToast'
+import { AuthApi } from '~/client/api/auth.api'
 
 const toast = useToast()
 
@@ -13,6 +14,16 @@ const signUpDto = z
       .string()
       .trim()
       .min(3, 'Username must contain at least 3 characters'),
+
+    firstName: z
+      .string()
+      .trim()
+      .min(2, 'First name must contain at least 2 characters'),
+
+    lastName: z
+      .string()
+      .trim()
+      .min(2, 'Last name must contain at least 2 characters'),
 
     password: z
       .string()
@@ -36,6 +47,16 @@ const formData = ref({
     error: '',
     focused: '',
   },
+  firstName: {
+    value: '',
+    error: '',
+    focused: '',
+  },
+  lastName: {
+    value: '',
+    error: '',
+    focused: '',
+  },
   password: {
     value: '',
     error: '',
@@ -48,60 +69,89 @@ const formData = ref({
   },
 })
 
+const isLoading = ref(false)
+
 function clearErrors(): void {
   formData.value.username.error = ''
+  formData.value.firstName.error = ''
+  formData.value.lastName.error = ''
   formData.value.password.error = ''
   formData.value.repeatPassword.error = ''
 }
 
-function undoError(field: keyof typeof formData.value) {
-  formData.value[field as keyof typeof formData.value].error = ''
+function undoError(field: keyof typeof formData.value): void {
+  formData.value[field].error = ''
 }
 
-function submit(): void {
-  clearErrors()
+async function submit(): Promise<void> {
+  try {
+    isLoading.value = true
+    clearErrors()
 
-  const result = signUpDto.safeParse({
-    username: formData.value.username.value,
-    password: formData.value.password.value,
-    repeatPassword: formData.value.repeatPassword.value,
-  })
+    const result = signUpDto.safeParse({
+      username: formData.value.username.value,
+      firstName: formData.value.firstName.value,
+      lastName: formData.value.lastName.value,
+      password: formData.value.password.value,
+      repeatPassword: formData.value.repeatPassword.value,
+    })
 
-  if (!result.success) {
-    const errors = result.error.flatten().fieldErrors
+    if (!result.success) {
+      const errors = result.error.flatten().fieldErrors
 
-    formData.value.username.error = errors.username?.[0] ?? ''
-    formData.value.password.error = errors.password?.[0] ?? ''
-    formData.value.repeatPassword.error =
-      errors.repeatPassword?.[0] ?? ''
+      formData.value.username.error = errors.username?.[0] ?? ''
+      formData.value.firstName.error = errors.firstName?.[0] ?? ''
+      formData.value.lastName.error = errors.lastName?.[0] ?? ''
+      formData.value.password.error = errors.password?.[0] ?? ''
+      formData.value.repeatPassword.error =
+        errors.repeatPassword?.[0] ?? ''
 
-    return
+      return
+    }
+
+    const {
+      ...payload
+    } = result.data
+
+    await AuthApi.signUp(payload)
+
+    toast.success('Success!')
+  } catch (err) {
+    console.error(err)
+    throw err
+  } finally {
+    isLoading.value = false
   }
-
-  toast.success('Success!')
-
-  console.debug(result.data)
 }
 </script>
 
 <template>
   <section class="mx-auto w-[360px] h-full flex items-center justify-center py-10">
     <article class="overlay-card">
-      <form class="w-[360px] h-[600px] flex flex-col px-[24px] py-[12px] gap-[28px]" @submit.prevent="submit">
-        <h1 class="text-[36px] ml-auto">Sign Up</h1>
-        <InputUI v-model="formData.username.value" placeholder="Username" :size="'large'" type="username"
-          label="Username" :error="formData.username.error" @input="() => undoError('username')" />
+      <form class="w-[360px] min-h-[720px] flex flex-col px-[24px] py-[12px] gap-[28px]" @submit.prevent="submit">
+        <h1 class="text-[36px] ml-auto">
+          Sign Up
+        </h1>
 
-        <InputUI v-model="formData.password.value" type="new-password" placeholder="Password" :size="'large'"
-          label="Password" :error="formData.password.error" @input="() => undoError('password')" />
+        <InputUI v-model="formData.username.value" placeholder="Username" :size="'large'" type="text" label="Username"
+          :error="formData.username.error" @input="undoError('username')" />
 
-        <InputUI v-model="formData.repeatPassword.value" type="new-password" placeholder="Repeat password"
-          :size="'large'" label="Repeat password" :error="formData.repeatPassword.error"
-          @input="() => undoError('repeatPassword')" />
+        <InputUI v-model="formData.firstName.value" placeholder="First name" :size="'large'" type="text"
+          label="First name" :error="formData.firstName.error" @input="undoError('firstName')" />
 
-        <div class="w-[100%] flex justify-center mt-auto mb-[24px]">
-          <ButtonUI type="submit" class="w-[50%]">
-            Submit
+        <InputUI v-model="formData.lastName.value" placeholder="Last name" :size="'large'" type="text" label="Last name"
+          :error="formData.lastName.error" @input="undoError('lastName')" />
+
+        <InputUI v-model="formData.password.value" type="password" autocomplete="new-password" placeholder="Password"
+          :size="'large'" label="Password" :error="formData.password.error" @input="undoError('password')" />
+
+        <InputUI v-model="formData.repeatPassword.value" type="password" autocomplete="new-password"
+          placeholder="Repeat password" :size="'large'" label="Repeat password" :error="formData.repeatPassword.error"
+          @input="undoError('repeatPassword')" />
+
+        <div class="w-full flex justify-center mt-auto mb-[24px]">
+          <ButtonUI type="submit" class="w-[50%]" :disabled="isLoading">
+            {{ isLoading ? 'Loading...' : 'Submit' }}
           </ButtonUI>
         </div>
       </form>

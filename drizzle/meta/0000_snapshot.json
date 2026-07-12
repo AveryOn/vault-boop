@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "b4c84979-a915-4ac7-98f7-0a4580461360",
+  "id": "9e6859b9-67c2-4f29-893d-0f729c60b7c8",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "action": {
@@ -16,13 +16,6 @@
         },
         "name": {
           "name": "name",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "user_id": {
-          "name": "user_id",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
@@ -52,22 +45,16 @@
           "autoincrement": false
         }
       },
-      "indexes": {},
-      "foreignKeys": {
-        "action_user_id_user_id_fk": {
-          "name": "action_user_id_user_id_fk",
-          "tableFrom": "action",
-          "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
+      "indexes": {
+        "action_name_unique": {
+          "name": "action_name_unique",
+          "columns": [
+            "name"
           ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "isUnique": true
         }
       },
+      "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "checkConstraints": {}
@@ -91,6 +78,13 @@
         },
         "access_token_id": {
           "name": "access_token_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "last_user_action_id": {
+          "name": "last_user_action_id",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
@@ -126,13 +120,6 @@
           "notNull": true,
           "autoincrement": false,
           "default": "CURRENT_TIMESTAMP"
-        },
-        "deleted_at": {
-          "name": "deleted_at",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
         }
       },
       "indexes": {},
@@ -162,6 +149,19 @@
           ],
           "onDelete": "cascade",
           "onUpdate": "no action"
+        },
+        "session_last_user_action_id_user_action_id_fk": {
+          "name": "session_last_user_action_id_user_action_id_fk",
+          "tableFrom": "session",
+          "tableTo": "user_action",
+          "columnsFrom": [
+            "last_user_action_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
@@ -178,11 +178,11 @@
           "notNull": true,
           "autoincrement": false
         },
-        "action": {
-          "name": "action",
+        "action_id": {
+          "name": "action_id",
           "type": "text",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false
         },
         "user_id": {
@@ -199,25 +199,23 @@
           "notNull": true,
           "autoincrement": false,
           "default": "CURRENT_TIMESTAMP"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "CURRENT_TIMESTAMP"
-        },
-        "deleted_at": {
-          "name": "deleted_at",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
         }
       },
       "indexes": {},
       "foreignKeys": {
+        "user_action_action_id_action_id_fk": {
+          "name": "user_action_action_id_action_id_fk",
+          "tableFrom": "user_action",
+          "tableTo": "action",
+          "columnsFrom": [
+            "action_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
         "user_action_user_id_user_id_fk": {
           "name": "user_action_user_id_user_id_fk",
           "tableFrom": "user_action",
@@ -246,15 +244,29 @@
           "notNull": true,
           "autoincrement": false
         },
-        "action": {
-          "name": "action",
+        "user_action_id": {
+          "name": "user_action_id",
           "type": "text",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false
         },
         "user_id": {
           "name": "user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "key_hash": {
+          "name": "key_hash",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
@@ -286,6 +298,19 @@
       },
       "indexes": {},
       "foreignKeys": {
+        "user_key_user_action_id_user_action_id_fk": {
+          "name": "user_key_user_action_id_user_action_id_fk",
+          "tableFrom": "user_key",
+          "tableTo": "user_action",
+          "columnsFrom": [
+            "user_action_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
         "user_key_user_id_user_id_fk": {
           "name": "user_key_user_id_user_id_fk",
           "tableFrom": "user_key",
@@ -328,11 +353,18 @@
           "notNull": true,
           "autoincrement": false
         },
+        "username": {
+          "name": "username",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
         "master_password_hash": {
           "name": "master_password_hash",
           "type": "text",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false
         },
         "created_at": {
@@ -361,6 +393,67 @@
       },
       "indexes": {},
       "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "access_token": {
+      "name": "access_token",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "token": {
+          "name": "token",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "archived_at": {
+          "name": "archived_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "access_token_user_id_user_id_fk": {
+          "name": "access_token_user_id_user_id_fk",
+          "tableFrom": "access_token",
+          "tableTo": "user",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "checkConstraints": {}

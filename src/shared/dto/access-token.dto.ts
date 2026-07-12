@@ -12,3 +12,9 @@ export type CreateAccessTokenResponse = Omit<AccessToken, 'token' | 'userId'>
 
 
 export type CreateAccessTokenSecureDto = Pick<AccessTokenInput, 'userId'>
+
+
+export interface AccessTokenPayload {
+  userId: string
+  username: string
+}

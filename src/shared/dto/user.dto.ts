@@ -12,7 +12,7 @@ export type UserInput = typeof userTable.$inferInsert
  */
 export type UserSafety = Omit<
   User,
-  'id' | 'masterPasswordHash' | 'username'
+  'masterPasswordHash' | 'username'
 >
 
 

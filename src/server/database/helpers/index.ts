@@ -1,5 +1,6 @@
 import { sql } from 'drizzle-orm'
 import { integer, text } from 'drizzle-orm/sqlite-core'
+import type { DatabaseAdapter } from '~/server/database/client'
 
 export const id = () =>
   text('id')
@@ -11,3 +12,11 @@ export const timestamp = (field: string, defaultNow: boolean = false) =>
 
 export const boolean = (field: string) =>
   integer(field, { mode: 'boolean' })
+
+
+export function SelectDatabaseAdapter(
+  db: DatabaseAdapter,
+  adapter?: DatabaseAdapter,
+): DatabaseAdapter {
+  return adapter ?? db
+}

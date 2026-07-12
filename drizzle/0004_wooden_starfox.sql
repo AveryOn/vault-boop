@@ -1,1 +1,0 @@
-ALTER TABLE `session` ADD `last_user_action_id` text NOT NULL REFERENCES action(id);

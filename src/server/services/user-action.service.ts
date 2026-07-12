@@ -1,14 +1,15 @@
 
 import { userActionTable } from '~/server/database/schema'
-import { db } from '~/server/database/client'
+import { db, type DatabaseTransaction } from '~/server/database/client'
 import { dateISO } from '~/shared/utils/datetime'
 import { eq } from 'drizzle-orm';
-import type { UserKeySafety } from '~/shared/dto/user-key.dto';
 import type { CreateUserActionDto, CreateUserActionSecureDto, UserActionSafety } from '~/shared/dto/user-action.dto';
+import { SelectDatabaseAdapter } from '~/server/database/helpers';
 
 export const UserActionService = {
-  async getList(): Promise<UserActionSafety[]> {
-    return await db
+  async getList(tx?: DatabaseTransaction): Promise<UserActionSafety[]> {
+    const database = SelectDatabaseAdapter(db, tx)
+    return await database
       .select({
         id: userActionTable.id,
         createdAt: userActionTable.createdAt,
@@ -17,8 +18,9 @@ export const UserActionService = {
       .from(userActionTable)
   },
 
-  async getById(userActionId: string): Promise<UserActionSafety | null> {
-    const [userAction] = await db
+  async getById(userActionId: string, tx?: DatabaseTransaction): Promise<UserActionSafety | null> {
+    const database = SelectDatabaseAdapter(db, tx)
+    const [userAction] = await database
       .select({
         id: userActionTable.id,
         createdAt: userActionTable.createdAt,
@@ -34,9 +36,11 @@ export const UserActionService = {
   async create(
     secureData: CreateUserActionSecureDto,
     dto: CreateUserActionDto,
-  ): Promise<UserKeySafety> {
+    tx?: DatabaseTransaction,
+  ): Promise<UserActionSafety> {
+    const database = SelectDatabaseAdapter(db, tx)
     const now = dateISO()
-    const [newUserAction] = await db
+    const [newUserAction] = await database
       .insert(userActionTable)
       .values({
         actionId: dto.actionId,

@@ -1,14 +1,17 @@
 import { userTable } from '~/server/database/schema'
-import { db } from '~/server/database/client'
+import { db as database, type DatabaseTransaction } from '~/server/database/client'
 import type { CreateUserDto, CreateUserResponse, UpdateUserDto, UpdateUserResponse, UserSafety } from '~/shared/dto/user.dto'
 import { dateISO } from '~/shared/utils/datetime'
 import { serverEnv as env } from '~/server/config/env/env.server';
 import { eq } from 'drizzle-orm';
+import { SelectDatabaseAdapter } from '~/server/database/helpers';
 
 export const UserService = {
-  async getList(): Promise<UserSafety[]> {
+  async getList(tx?: DatabaseTransaction): Promise<UserSafety[]> {
+    const db = SelectDatabaseAdapter(database, tx)
     return await db
       .select({
+        id: userTable.id,
         firstName: userTable.firstName,
         lastName: userTable.lastName,
         createdAt: userTable.createdAt,
@@ -19,8 +22,9 @@ export const UserService = {
   },
 
   async getById(userId: string): Promise<UserSafety> {
-    const [user] = await db
+    const [user] = await database
       .select({
+        id: userTable.id,
         firstName: userTable.firstName,
         lastName: userTable.lastName,
         createdAt: userTable.createdAt,
@@ -34,9 +38,11 @@ export const UserService = {
     return user
   },
 
-  async getByUsername(username: string): Promise<UserSafety | null> {
+  async getByUsername(username: string, tx?: DatabaseTransaction): Promise<UserSafety | null> {
+    const db = SelectDatabaseAdapter(database, tx)
     const [user] = await db
       .select({
+        id: userTable.id,
         firstName: userTable.firstName,
         lastName: userTable.lastName,
         createdAt: userTable.createdAt,
@@ -51,7 +57,8 @@ export const UserService = {
   },
 
 
-  async create(data: CreateUserDto): Promise<CreateUserResponse> {
+  async create(data: CreateUserDto, tx?: DatabaseTransaction): Promise<CreateUserResponse> {
+    const db = SelectDatabaseAdapter(database, tx)
     const now = dateISO()
     const [user] = await db
       .insert(userTable)
@@ -67,6 +74,7 @@ export const UserService = {
         deletedAt: null,
       })
       .returning({
+        id: userTable.id,
         firstName: userTable.firstName,
         lastName: userTable.lastName,
         createdAt: userTable.createdAt,
@@ -77,7 +85,8 @@ export const UserService = {
     return user
   },
 
-  async update(userId: string, data: UpdateUserDto): Promise<UpdateUserResponse> {
+  async update(userId: string, data: UpdateUserDto, tx?: DatabaseTransaction): Promise<UpdateUserResponse> {
+    const db = SelectDatabaseAdapter(database, tx)
     const now = dateISO()
     const [user] = await db
       .update(userTable)
@@ -91,6 +100,7 @@ export const UserService = {
       })
       .where(eq(userTable.id, userId))
       .returning({
+        id: userTable.id,
         firstName: userTable.firstName,
         lastName: userTable.lastName,
         createdAt: userTable.createdAt,
@@ -100,8 +110,9 @@ export const UserService = {
     return user
   },
 
-  async delete(userId: string): Promise<boolean> {
+  async delete(userId: string, tx?: DatabaseTransaction): Promise<boolean> {
     try {
+      const db = SelectDatabaseAdapter(database, tx)
       const now = dateISO()
       await db
         .update(userTable)

@@ -1,4 +1,5 @@
 import z from 'zod'
+import type { TimeUnitKey } from '~/shared/utils/datetime'
 
 export const serverEnvSchema = z.object({
   NODE_ENV: z
@@ -14,9 +15,17 @@ export const serverEnvSchema = z.object({
   HASH_ALGORITHM_MEM_COST: z.coerce.number(),
   HASH_ALGORITHM_TIME_COST: z.coerce.number(),
   HASH_ALGORITHM_PARALLELISM: z.coerce.number(),
+
+  SESSION_TTL: z.custom<TimeUnitKey>(
+    value => typeof value === 'string' &&
+      /^(\d+(?:\.\d+)?)(ms|mo|s|m|h|d|w|y)$/.test(value))
 })
 
-const parsed = serverEnvSchema.safeParse(import.meta.env)
+const envSource = {
+  ...process.env,
+  ...(import.meta.env ?? {}),
+}
+const parsed = serverEnvSchema.safeParse(envSource)
 
 if (!parsed.success) {
   console.error(JSON.stringify(z.treeifyError(parsed.error)))

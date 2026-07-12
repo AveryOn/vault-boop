@@ -2,7 +2,8 @@ import { db } from "~/server/database/client";
 import { accessTokenTable } from "~/server/database/schema";
 import { eq } from "drizzle-orm";
 import { dateISO } from "~/shared/utils/datetime";
-import type { AccessToken, CreateAccessTokenDto, CreateAccessTokenSecureDto } from "~/shared/dto/access-token.dto";
+import type { AccessToken, AccessTokenPayload, CreateAccessTokenDto, CreateAccessTokenSecureDto } from "~/shared/dto/access-token.dto";
+import { decryptData, encryptData } from "~/server/utils/crypto";
 
 
 export const AccessTokenService = {
@@ -57,6 +58,20 @@ export const AccessTokenService = {
     catch (err) {
       console.error(err)
       return false
+    }
+  },
+
+  async generateAccessToken(payload: AccessTokenPayload) {
+    return await encryptData(JSON.stringify(payload), 'access')
+  },
+
+  async decodeAccessToken(cipher: string): Promise<AccessTokenPayload> {
+    try {
+      const raw = await decryptData(cipher, 'access')
+      return JSON.parse(raw)
+    } catch (err) {
+      console.error(err)
+      throw err
     }
   }
 }
