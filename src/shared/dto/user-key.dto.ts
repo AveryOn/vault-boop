@@ -16,6 +16,7 @@ export const createUserKeyDto = z.object({
   key: z.string().trim().min(3),
 })
 export type CreateUserKeyDto = z.infer<typeof createUserKeyDto>
+export type CreateUserKeySecureDto = Pick<UserKeyInput, 'userId' | 'userActionId'>
 
 export type CreateUserKeyResponse = UserKeySafety
 
