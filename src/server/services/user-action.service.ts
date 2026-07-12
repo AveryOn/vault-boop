@@ -33,7 +33,10 @@ export const UserActionService = {
     return userAction ?? null
   },
 
-  async create(secureData: CreateUserActionSecureDto, dto: CreateUserActionDto): Promise<UserKeySafety> {
+  async create(
+    secureData: CreateUserActionSecureDto,
+    dto: CreateUserActionDto,
+  ): Promise<UserKeySafety> {
     const now = dateISO()
     const [newUserAction] = await db
       .insert(userActionTable)
