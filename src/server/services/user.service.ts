@@ -82,4 +82,19 @@ export const UserService = {
       })
     return user
   },
+
+  async delete(userId: string): Promise<boolean> {
+    try {
+      await db
+        .delete(userTable)
+        .where(
+          eq(userTable.id, userId),
+        )
+      return true
+    }
+    catch (err) {
+      console.error(err)
+      return false
+    }
+  }
 }
