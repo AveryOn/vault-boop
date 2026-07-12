@@ -40,7 +40,20 @@ export const SessionService = {
       .where(
         eq(sessionTable.accessTokenId, accessTokenId),
       )
-
     return session ?? null
+  },
+
+  async terminateAllSession(): Promise<boolean> {
+    try {
+      await db
+        .update(sessionTable)
+        .set({
+          status: 'TERMINATED'
+        })
+    }
+    catch (err) {
+      console.error(err)
+      return false
+    }
   }
 }

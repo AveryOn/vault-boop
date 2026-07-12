@@ -10,3 +10,10 @@ export enum ProcessStatus {
   ERROR = 'ERROR',
   REJECT = 'REJECT',
 }
+
+export enum SessionStatus {
+  TERMINATED = 'TERMINATED',
+  EXPIRED = 'EXPIRED',
+  ACTIVE = 'ACTIVE',
+  PENDING = 'PENDING',
+}
