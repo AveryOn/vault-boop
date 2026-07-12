@@ -2,7 +2,7 @@ import { sqliteTable, text } from 'drizzle-orm/sqlite-core'
 import { id, timestamp } from '~/server/database/helpers'
 import { vaultUserTable } from '~/server/database/schema/vault-user.table'
 
-export const vaultUserActionTable = sqliteTable('vault_user_action', {
+export const vaultSessionTable = sqliteTable('vault_session', {
   id: id(),
 
   vaultUserId: text('vault_user_id')
