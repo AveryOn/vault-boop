@@ -5,7 +5,6 @@ export type User = typeof userTable.$inferSelect
 export type UserInput = typeof userTable.$inferInsert
 
 export const createUserDto = z.object({
-  // profileId: z.uuid(),
   username: z.string().trim().min(3),
   firstName: z.string().trim().min(3),
   lastName: z.string().trim().min(3),
