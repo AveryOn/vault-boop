@@ -61,5 +61,23 @@ export const SessionService = {
       console.error(err)
       return false
     }
+  },
+
+  async terminateSession(sessionId: string): Promise<boolean> {
+    try {
+      await db
+        .update(sessionTable)
+        .set({
+          status: SessionStatus.TERMINATED,
+        })
+        .where(
+          eq(sessionTable.id, sessionId),
+        )
+      return true
+    }
+    catch (err) {
+      console.error(err)
+      return false
+    }
   }
 }
