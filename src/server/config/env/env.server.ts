@@ -6,7 +6,8 @@ export const serverEnvSchema = z.object({
     .default('development'),
 
   DATABASE_URL: z.string().min(1),
-  HASH_kEY: z.string().min(1),
+  DATA_HASH_KEY: z.string().min(1),
+  ACCESS_HASH_KEY: z.string().min(1),
   ACCESS_TOKEN_TTL: z.string(),
   CIPHER_ALGORITHM: z.string(),
   HASH_ALGORITHM: z.string(),
