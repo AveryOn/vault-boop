@@ -10,3 +10,4 @@ export const createUserActionDto = z.object({
 })
 export type CreateUserActionDto = z.infer<typeof createUserActionDto>
 export type CreateUserActionResponse = UserAction
+export type CreateUserActionSecureDto = Pick<UserActionInput, 'userId'>
