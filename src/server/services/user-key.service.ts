@@ -1,10 +1,9 @@
 import { userKeyTable, userTable } from '~/server/database/schema'
 import { db } from '~/server/database/client'
-import type { CreateUserDto, CreateUserResponse, UpdateUserDto, UpdateUserResponse, UserSafety } from '~/shared/dto/user.dto'
 import { dateISO } from '~/shared/utils/datetime'
 import { serverEnv as env } from '~/server/config/env/env.server';
 import { eq } from 'drizzle-orm';
-import type { CreateUserKeyDto, CreateUserKeySecureDto, UserKey, UserKeySafety } from '~/shared/dto/user-key.dto';
+import type { CreateUserKeyDto, CreateUserKeySecureDto, UserKeySafety } from '~/shared/dto/user-key.dto';
 
 export const UserKeyService = {
   async getList(): Promise<UserKeySafety[]> {
