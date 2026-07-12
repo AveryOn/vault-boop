@@ -12,4 +12,5 @@ export const createUserDto = z.object({
 })
 export type CreateUserDto = z.infer<typeof createUserDto>
 
-export type CreateUserResponse = Omit<User, 'masterPasswordHash'>
+export type CreateUserResponse = Omit<User, 'masterPasswordHash' | 'username'>
+
