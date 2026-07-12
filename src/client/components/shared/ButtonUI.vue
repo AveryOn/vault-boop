@@ -38,17 +38,8 @@ const spinnerSize = computed(() => {
 </script>
 
 <template>
-  <button
-    class="button"
-    :class="`button--${props.size}`"
-    :disabled="props.disabled"
-  >
-    <Icon
-      v-if="props.loading"
-      class="loading-ui__spinner"
-      :icon="mdiLoading"
-      :size="spinnerSize"
-    ></Icon>
+  <button class="button" :class="`button--${props.size}`" :disabled="props.disabled">
+    <Icon v-if="props.loading" class="loading-ui__spinner" :icon="mdiLoading" :size="spinnerSize"></Icon>
     <slot name="default">{{ props.label ?? $slots }}</slot>
   </button>
 </template>
@@ -60,7 +51,6 @@ const spinnerSize = computed(() => {
   height: 100%;
   background-color: var(--button-color-1);
   border-radius: 10px;
-  margin: 0 6px;
   transition: all 0.4s ease;
 }
 
