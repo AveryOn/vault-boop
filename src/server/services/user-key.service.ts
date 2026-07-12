@@ -3,7 +3,7 @@ import { db } from '~/server/database/client'
 import { dateISO } from '~/shared/utils/datetime'
 import { serverEnv as env } from '~/server/config/env/env.server';
 import { eq } from 'drizzle-orm';
-import type { CreateUserKeyDto, CreateUserKeySecureDto, UserKeySafety } from '~/shared/dto/user-key.dto';
+import type { CreateUserKeyDto, CreateUserKeySecureDto, UpdateUserKeyDto, UserKeySafety } from '~/shared/dto/user-key.dto';
 
 export const UserKeyService = {
   async getList(): Promise<UserKeySafety[]> {
@@ -40,7 +40,8 @@ export const UserKeyService = {
     const [key] = await db
       .insert(userKeyTable)
       .values({
-        keyHash: dto.key + env.HASH_kEY,
+        //  TODO ПОСТАВИТЬ РЕАЛЬНУЮ ЗАЩИТУ
+        keyHash: dto.key + env.HASH_kEY,//  TODO ПОСТАВИТЬ РЕАЛЬНУЮ ЗАЩИТУ
         name: dto.name,
         createdAt: now,
         updatedAt: now,
@@ -57,6 +58,44 @@ export const UserKeyService = {
       })
 
     return key
-  }
+  },
 
+  async update(dto: UpdateUserKeyDto): Promise<UserKeySafety> {
+    const now = dateISO()
+    const [key] = await db
+      .update(userKeyTable)
+      .set({
+        name: dto.name,
+        //  TODO ПОСТАВИТЬ РЕАЛЬНУЮ ЗАЩИТУ
+        keyHash: dto.key, //  TODO ПОСТАВИТЬ РЕАЛЬНУЮ ЗАЩИТУ
+        updatedAt: now,
+      })
+      .returning({
+        id: userKeyTable.id,
+        name: userKeyTable.name,
+        userActionId: userKeyTable.userActionId,
+        createdAt: userKeyTable.createdAt,
+        updatedAt: userKeyTable.updatedAt,
+      })
+    return key;
+  },
+
+  async delete(keyId: string): Promise<boolean> {
+    try {
+      const now = dateISO()
+      await db
+        .update(userKeyTable)
+        .set({
+          deletedAt: now,
+        })
+        .where(
+          eq(userKeyTable.id, keyId)
+        )
+      return true
+    }
+    catch (err) {
+      console.error(err)
+      return false
+    }
+  }
 }
