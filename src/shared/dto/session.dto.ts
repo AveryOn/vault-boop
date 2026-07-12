@@ -5,8 +5,6 @@ export type Session = typeof sessionTable.$inferSelect
 export type SessionInput = typeof sessionTable.$inferInsert
 
 export const createSessionDto = z.object({
-  userId: z.uuid(),
-  accessTokenId: z.uuid(),
   lastUserActionId: z.uuid(),
   expiresAt: z.string(),
   lastUsedAt: z.string(),
