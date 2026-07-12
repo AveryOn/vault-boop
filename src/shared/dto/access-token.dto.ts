@@ -1,0 +1,20 @@
+import z from 'zod'
+import { accessTokenTable } from '~/server/database/schema'
+
+export type AccessToken = typeof accessTokenTable.$inferSelect
+export type AccessTokenInput = typeof accessTokenTable.$inferInsert
+
+export const createAccessTokenDto = z.object({
+  token: z.string(),
+  userId: z.uuid(),
+})
+export type CreateAccessTokenDto = z.infer<typeof createAccessTokenDto>
+
+export type CreateAccessTokenResponse = Omit<AccessToken, 'token' | 'userId'>
+
+export const updateAccessTokenDto = z.object({
+  token: z.string(),
+})
+
+export type UpdateAccessTokenDto = z.infer<typeof updateAccessTokenDto>
+export type UpdateAccessTokenResponse = Omit<AccessToken, 'token' | 'userId'>
