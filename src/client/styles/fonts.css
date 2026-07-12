@@ -1,0 +1,45 @@
+@font-face {
+  font-family: 'Montserrat';
+  src: url('/fonts/montserrat/montserrat-variable.ttf')
+    format('truetype');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Nunito';
+  src: url('/fonts/nunito/nunito-variable.ttf') format('truetype');
+  font-weight: 200 1000;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'WDXL Lubrifont TC';
+  src: url('/fonts/wdxl-lubrifont/wdxl-lubrifont-regular.ttf')
+    format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --font-heading: 'Montserrat', system-ui, sans-serif;
+  --font-body: 'Nunito', system-ui, sans-serif;
+  --font-display: 'WDXL Lubrifont TC', system-ui, sans-serif;
+}
+
+html,
+body {
+  font-family: var(--font-body);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-heading);
+}

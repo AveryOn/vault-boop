@@ -1,0 +1,15 @@
+---
+import Layout from '~/client/layouts/Layout.astro'
+import IndexHeader from '~/client/components/common/IndexHeader.vue'
+import IndexFooter from '~/client/components/common/IndexFooter.vue'
+import CvMainView from '~/client/components/admin/cv/CvMainView.vue'
+import CvLinkNewView from '~/client/components/admin/cv/links/CvLinkNewView.vue'
+---
+
+<Layout title={'PORTFOLIO--ADMIN'}>
+  <IndexHeader client:only="vue" slot="header" />
+  <CvMainView client:only="vue" slot="main">
+    <CvLinkNewView client:only="vue" />
+  </CvMainView>
+  <IndexFooter />
+</Layout>

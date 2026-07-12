@@ -1,0 +1,54 @@
+---
+import ToastViewport from '~/client/components/shared/ToastViewport.vue'
+
+export interface Props {
+  title?: string
+  description?: string
+}
+
+const {
+  title = 'Developer Platform',
+  description = 'Backend architecture, projects, technical notes, and developer portfolio.',
+} = Astro.props
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="robots" content="noindex, nofollow, nosnippet" />
+    <meta name="description" content={description} />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1"
+    />
+    <meta name="generator" content={Astro.generator} />
+
+    <title>{title}</title>
+  </head>
+
+  <body>
+    <div class="min-h-svh bg-[--bg-color-1] text-[#e6edf3]">
+      <div
+        class="mx-auto grid min-h-svh w-full max-w-[1440px] grid-rows-[auto_1fr_auto] px-4 sm:px-6 lg:px-8"
+      >
+        <header
+          class="sticky top-0 z-50 border-b border-[--base-border-color-3] bg-[--primary-color-2] backdrop-blur-[10px]"
+        >
+          <slot name="header" />
+        </header>
+
+        <main class="py-1">
+          <slot name="main" />
+        </main>
+
+        <footer
+          class="border-t border-[--base-border-color-3] py-8 bg-[--primary-color-2]"
+        >
+          <slot name="footer" />
+        </footer>
+      </div>
+      <ToastViewport client:only="vue" position="bottom-right" />
+    </div>
+  </body>
+</html>

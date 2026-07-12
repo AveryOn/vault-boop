@@ -1,0 +1,34 @@
+---
+import { eq } from 'drizzle-orm'
+import Layout from '~/client/layouts/Layout.astro'
+import { db } from '~/server/database/client'
+import { articlesTable } from '~/server/database/schema'
+import { renderMarkdown } from '~/shared/utils/markdown/renderMarkdown'
+import ArticleView from '~/client/components/news/ArticleView.vue'
+import IndexHeader from '~/client/components/common/IndexHeader.vue'
+import IndexFooter from '~/client/components/common/IndexFooter.vue'
+
+const { uuid } = Astro.params
+
+if (!uuid) {
+  return Astro.redirect('/')
+}
+
+const [article] = await db
+  .select()
+  .from(articlesTable)
+  .where(eq(articlesTable.id, uuid))
+  .limit(1)
+
+if (!article) {
+  return Astro.redirect('/404')
+}
+
+const html = await renderMarkdown(article.content)
+---
+
+<Layout title={article.title}>
+  <IndexHeader client:only="vue" slot="header" />
+  <ArticleView client:only="vue" html={html} uuid={uuid} slot="main" />
+  <IndexFooter client:only="vue" slot="footer" />
+</Layout>

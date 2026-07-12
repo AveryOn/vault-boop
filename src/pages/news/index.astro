@@ -1,0 +1,15 @@
+---
+import Layout from '~/client/layouts/Layout.astro'
+import NewsView from '~/client/components/news/NewsView.vue'
+import IndexHeader from '~/client/components/common/IndexHeader.vue'
+import IndexFooter from '~/client/components/common/IndexFooter.vue'
+import { ArticleService } from '~/server/services'
+
+const articles = await ArticleService.getList()
+---
+
+<Layout title={'NEWS'}>
+  <IndexHeader client:only="vue" slot="header" />
+  <NewsView client:only="vue" articles={articles} slot="main" />
+  <IndexFooter client:only="vue" slot="footer" />
+</Layout>

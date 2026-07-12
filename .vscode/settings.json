@@ -1,0 +1,24 @@
+{
+  "editor.formatOnSave": true,
+
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "always"
+  },
+
+  "eslint.validate": ["javascript", "typescript", "vue", "astro"],
+
+  "eslint.useFlatConfig": true,
+
+  "[astro]": {
+    "editor.defaultFormatter": "astro-build.astro-vscode"
+  },
+
+  "[typescript]": {
+    "editor.defaultFormatter": "vscode.typescript-language-features"
+  },
+
+  "[vue]": {
+    "editor.defaultFormatter": "Vue.volar"
+  },
+  "cSpell.words": ["outlok"]
+}

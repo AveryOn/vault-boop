@@ -1,0 +1,15 @@
+---
+import Layout from '~/client/layouts/Layout.astro'
+import IndexHeader from '~/client/components/common/IndexHeader.vue'
+import IndexFooter from '~/client/components/common/IndexFooter.vue'
+import ArticlesView from '~/client/components/admin/articles/ArticlesView.vue'
+import { ArticleService } from '~/server/services'
+
+const articles = await ArticleService.getList()
+---
+
+<Layout title={'PORTFOLIO--ADMIN'}>
+  <IndexHeader client:only="vue" slot="header" />
+  <ArticlesView client:only="vue" slot="main" articles={articles} />
+  <IndexFooter />
+</Layout>

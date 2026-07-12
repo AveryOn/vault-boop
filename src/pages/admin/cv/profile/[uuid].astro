@@ -1,0 +1,28 @@
+---
+import Layout from '~/client/layouts/Layout.astro'
+import IndexHeader from '~/client/components/common/IndexHeader.vue'
+import IndexFooter from '~/client/components/common/IndexFooter.vue'
+import CvMainView from '~/client/components/admin/cv/CvMainView.vue'
+import CvProfileByIdView from '~/client/components/admin/cv/profiles/CvProfileByIdView.vue'
+import { CvProfileService } from '~/server/services/admin/cv/profile.service'
+import { AppRoutes } from '~/shared/router'
+
+const { uuid } = Astro.params
+
+if (!uuid) {
+  return Astro.redirect(AppRoutes.api.CvProfiles)
+}
+
+const profile = await CvProfileService.getById(uuid)
+if (!profile) {
+  return Astro.redirect(AppRoutes.api.CvProfiles)
+}
+---
+
+<Layout title={'PORTFOLIO--ADMIN'}>
+  <IndexHeader client:only="vue" slot="header" />
+  <CvMainView client:only="vue" slot="main">
+    <CvProfileByIdView client:only="vue" uuid={uuid} profile={profile} />
+  </CvMainView>
+  <IndexFooter />
+</Layout>

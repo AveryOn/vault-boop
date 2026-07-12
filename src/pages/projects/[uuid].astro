@@ -1,0 +1,15 @@
+---
+import IndexFooter from '~/client/components/common/IndexFooter.vue'
+import IndexHeader from '~/client/components/common/IndexHeader.vue'
+import ProjectsView from '~/client/components/projects/ProjectsView.vue'
+import Layout from '~/client/layouts/Layout.astro'
+
+const { params } = Astro
+console.debug(params.uuid)
+---
+
+<Layout title="Developer Platform">
+  <IndexHeader client:only="vue" slot="header" />
+  <ProjectsView client:only="vue" uuid={params.uuid ?? ''} slot="main" />
+  <IndexFooter client:only="vue" slot="footer" />
+</Layout>

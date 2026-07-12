@@ -1,0 +1,11 @@
+{
+  "Hello World!": "Привет мир!",
+  "Project": "проект | проекта | проектов",
+  "You have {count} project": "У тебя {count} проект | У тебя {count} проекта | У тебя {count} проектов",
+  "Adjust the color schema": "Настройка цветовой схемы",
+  "Projects Management": "Управление проектами",
+  "Articles Management": "Управление статьями",
+  "CV Management": "Управление резюме",
+  "Input Here": "Здесь ввод",
+  "Title": "Название"
+}

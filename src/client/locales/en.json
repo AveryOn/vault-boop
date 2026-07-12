@@ -1,0 +1,11 @@
+{
+  "Hello World!": "Hello World!",
+  "Project": "project | projects",
+  "You have {count} project": "You have {count} project | You have {count} projects",
+  "Adjust the color schema": "Adjust the color schema",
+  "Projects Management": "Projects Management",
+  "Articles Management": "Articles Management",
+  "CV Management": "CV Management",
+  "Input Here": "Input Here",
+  "Title": "Title"
+}
