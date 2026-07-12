@@ -6,7 +6,6 @@ export type AccessTokenInput = typeof accessTokenTable.$inferInsert
 
 export const createAccessTokenDto = z.object({
   token: z.string(),
-  userId: z.uuid(),
 })
 export type CreateAccessTokenDto = z.infer<typeof createAccessTokenDto>
 export type CreateAccessTokenResponse = Omit<AccessToken, 'token' | 'userId'>
