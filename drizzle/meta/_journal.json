@@ -43,6 +43,20 @@
       "when": 1783861292146,
       "tag": "0005_third_bloodstrike",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1783861315634,
+      "tag": "0006_needy_blink",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "6",
+      "when": 1783861625734,
+      "tag": "0007_skinny_agent_zero",
+      "breakpoints": true
     }
   ]
 }

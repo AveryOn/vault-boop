@@ -5,7 +5,6 @@ export type UserAction = typeof userActionTable.$inferSelect
 export type UserActionInput = typeof userActionTable.$inferInsert
 
 export const createUserActionDto = z.object({
-  userId: z.uuid(),
   actionId: z.uuid(),
 })
 export type CreateUserActionDto = z.infer<typeof createUserActionDto>
