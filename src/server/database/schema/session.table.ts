@@ -1,7 +1,7 @@
 import { sqliteTable, text } from 'drizzle-orm/sqlite-core'
 import { id, timestamp } from '~/server/database/helpers'
 import { userTable } from '~/server/database/schema/user.table'
-import { actionTable } from './action.table'
+import { userActionTable } from '~/server/database/schema/user-action.table'
 
 export const sessionTable = sqliteTable('session', {
   id: id(),
@@ -16,7 +16,7 @@ export const sessionTable = sqliteTable('session', {
 
   lastUserActionId: text('last_user_action_id')
     .notNull()
-    .references(() => actionTable.id, { onDelete: 'no action' }),
+    .references(() => userActionTable.id, { onDelete: 'no action' }),
 
   status: text('status').default('ACTIVE'),
   expiresAt: timestamp('expires_at').notNull(),
