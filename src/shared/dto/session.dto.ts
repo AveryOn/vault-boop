@@ -21,3 +21,9 @@ export const updateSessionDto = z.object({
 
 export type UpdateSessionDto = z.infer<typeof updateSessionDto>
 export type UpdateSessionResponse = Session
+
+
+export const terminateAllSessionsDto = z.object({
+  userId: z.uuid(),
+})
+export type TerminateAllSessionsDto = z.infer<typeof terminateAllSessionsDto>

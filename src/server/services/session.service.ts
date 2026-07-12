@@ -1,7 +1,8 @@
-import type { Session } from "~/shared/dto/session.dto";
+import type { Session, TerminateAllSessionsDto } from "~/shared/dto/session.dto";
 import { db } from "~/server/database/client";
 import { sessionTable } from "../database/schema";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
+import { SessionStatus } from "~/shared/const";
 
 
 export const SessionService = {
@@ -43,13 +44,17 @@ export const SessionService = {
     return session ?? null
   },
 
-  async terminateAllSession(): Promise<boolean> {
+  async terminateAllSession(dto: TerminateAllSessionsDto): Promise<boolean> {
     try {
       await db
         .update(sessionTable)
         .set({
-          status: 'TERMINATED'
+          status: SessionStatus.TERMINATED,
         })
+        .where(
+          eq(sessionTable.userId, dto.userId),
+        )
+      return true
     }
     catch (err) {
       console.error(err)
