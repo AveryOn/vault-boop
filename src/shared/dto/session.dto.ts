@@ -7,7 +7,7 @@ export type SessionInput = typeof sessionTable.$inferInsert
 export const createSessionDto = z.object({
   userId: z.uuid(),
   accessTokenId: z.uuid(),
-  lastActionId: z.uuid(),
+  lastUserActionId: z.uuid(),
   expiresAt: z.string(),
   lastUsedAt: z.string(),
 })
@@ -16,7 +16,7 @@ export type CreateSessionResponse = Session
 
 export const updateSessionDto = z.object({
   accessTokenId: z.uuid(),
-  lastActionId: z.uuid(),
+  lastUserActionId: z.uuid(),
   expiresAt: z.string(),
   lastUsedAt: z.string(),
 })
