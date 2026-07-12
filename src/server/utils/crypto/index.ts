@@ -15,7 +15,7 @@ function getKey(): Buffer {
     .digest()
 }
 
-export function encrypt(value: string): string {
+export function encryptData(value: string): string {
   const iv = crypto.randomBytes(12)
   const cipher = crypto.createCipheriv(
     env.CIPHER_ALGORITHM as CipherGCMTypes,
@@ -38,7 +38,7 @@ export function encrypt(value: string): string {
 }
 
 
-export function decrypt(value: string): string {
+export function decryptData(value: string): string {
   const [ivBase64, authTagBase64, encryptedBase64] = value.split(':')
 
   if (!ivBase64 || !authTagBase64 || !encryptedBase64) {
