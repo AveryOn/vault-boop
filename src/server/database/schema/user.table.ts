@@ -6,7 +6,7 @@ export const userTable = sqliteTable('user', {
 
   firstName: text('first_name').notNull(),
   lastName: text('last_name').notNull(),
-  masterPasswordHash: text('master_password_hash'),
+  masterPasswordHash: text('master_password_hash').notNull(),
 
   createdAt: timestamp('created_at', true).notNull(),
   updatedAt: timestamp('updated_at', true).notNull(),
