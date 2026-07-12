@@ -1,19 +1,26 @@
 import { userTable } from '~/server/database/schema'
 import { db } from '~/server/database/client'
-import type { CreateUserDto, CreateUserResponse, UpdateUserDto, UpdateUserResponse, User, UserSafety } from '~/shared/dto/user.dto'
+import type { CreateUserDto, CreateUserResponse, UpdateUserDto, UpdateUserResponse, UserSafety } from '~/shared/dto/user.dto'
 import { dateISO } from '~/shared/utils/datetime'
 import { serverEnv as env } from '~/server/config/env/env.server';
 import { eq } from 'drizzle-orm';
 
 export const UserService = {
-  async getList(): Promise<User[]> {
-    return await db.select().from(userTable)
+  async getList(): Promise<UserSafety[]> {
+    return await db
+      .select({
+        firstName: userTable.firstName,
+        lastName: userTable.lastName,
+        createdAt: userTable.createdAt,
+        updatedAt: userTable.updatedAt,
+        deletedAt: userTable.deletedAt,
+      })
+      .from(userTable)
   },
 
   async getById(userId: string): Promise<UserSafety> {
     const [user] = await db
       .select({
-        id: userTable.id,
         firstName: userTable.firstName,
         lastName: userTable.lastName,
         createdAt: userTable.createdAt,
@@ -66,10 +73,13 @@ export const UserService = {
         updatedAt: now,
       })
       .where(eq(userTable.id, userId))
-      .returning()
-
-    Reflect.deleteProperty(user, 'masterPasswordHash')
-    Reflect.deleteProperty(user, 'username')
+      .returning({
+        firstName: userTable.firstName,
+        lastName: userTable.lastName,
+        createdAt: userTable.createdAt,
+        updatedAt: userTable.updatedAt,
+        deletedAt: userTable.deletedAt,
+      })
     return user
   },
 }

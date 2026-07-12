@@ -4,6 +4,12 @@ import type { userTable } from '~/server/database/schema'
 export type User = typeof userTable.$inferSelect
 export type UserInput = typeof userTable.$inferInsert
 
+/**
+ * Тот же самый User но без чувствительных полей:
+ * * `id`
+ * * `masterPasswordHash`
+ * * `username`
+ */
 export type UserSafety = Omit<
   User,
   'id' | 'masterPasswordHash' | 'username'
