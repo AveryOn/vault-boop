@@ -1,12 +1,11 @@
 
 
-import { userActionTable, userKeyTable, userTable } from '~/server/database/schema'
+import { userActionTable } from '~/server/database/schema'
 import { db } from '~/server/database/client'
 import { dateISO } from '~/shared/utils/datetime'
-import { serverEnv as env } from '~/server/config/env/env.server';
 import { eq } from 'drizzle-orm';
-import type { CreateUserKeyDto, CreateUserKeySecureDto, UpdateUserKeyDto, UserKeySafety } from '~/shared/dto/user-key.dto';
-import type { CreateUserActionDto, CreateUserActionSecureDto, UserAction, UserActionSafety } from '~/shared/dto/user-action.dto';
+import type { UserKeySafety } from '~/shared/dto/user-key.dto';
+import type { CreateUserActionDto, CreateUserActionSecureDto, UserActionSafety } from '~/shared/dto/user-action.dto';
 
 export const UserActionService = {
   async getList(): Promise<UserActionSafety[]> {
@@ -53,12 +52,4 @@ export const UserActionService = {
 
     return newUserAction
   },
-
-  async update(dto: UpdateUserKeyDto): Promise<UserKeySafety> {
-
-  },
-
-  async delete(keyId: string): Promise<boolean> {
-
-  }
 }
