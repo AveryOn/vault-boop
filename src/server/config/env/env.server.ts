@@ -6,6 +6,7 @@ export const serverEnvSchema = z.object({
     .default('development'),
 
   DATABASE_URL: z.string().min(1),
+  HASH_kEY: z.string().min(1),
 })
 
 const parsed = serverEnvSchema.safeParse(import.meta.env)
