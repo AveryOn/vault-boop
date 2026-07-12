@@ -9,12 +9,5 @@ export const createAccessTokenDto = z.object({
   userId: z.uuid(),
 })
 export type CreateAccessTokenDto = z.infer<typeof createAccessTokenDto>
-
 export type CreateAccessTokenResponse = Omit<AccessToken, 'token' | 'userId'>
 
-export const updateAccessTokenDto = z.object({
-  token: z.string(),
-})
-
-export type UpdateAccessTokenDto = z.infer<typeof updateAccessTokenDto>
-export type UpdateAccessTokenResponse = Omit<AccessToken, 'token' | 'userId'>
