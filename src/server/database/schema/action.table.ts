@@ -2,12 +2,12 @@ import { sqliteTable, text } from 'drizzle-orm/sqlite-core'
 import { id, timestamp } from '~/server/database/helpers'
 import { userTable } from '~/server/database/schema/user.table'
 
-export const vaultActionTable = sqliteTable('vault_action', {
+export const actionTable = sqliteTable('action', {
   id: id(),
 
   name: text('name').notNull(),
 
-  vaultUserId: text('vault_user_id')
+  userId: text('user_id')
     .notNull()
     .references(() => userTable.id, { onDelete: 'cascade' }),
 
