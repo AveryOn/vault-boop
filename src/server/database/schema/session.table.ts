@@ -22,5 +22,4 @@ export const sessionTable = sqliteTable('session', {
   expiresAt: timestamp('expires_at').notNull(),
   lastUsedAt: timestamp('last_used_at', true).notNull(),
   createdAt: timestamp('created_at', true).notNull(),
-  deletedAt: timestamp('deleted_at'),
 })
