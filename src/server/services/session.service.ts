@@ -1,7 +1,7 @@
 import type { Session, TerminateAllSessionsDto } from "~/shared/dto/session.dto";
 import { db } from "~/server/database/client";
 import { sessionTable } from "../database/schema";
-import { and, eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { SessionStatus } from "~/shared/const";
 
 
