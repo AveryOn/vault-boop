@@ -4,18 +4,29 @@ import { dateISO } from '~/shared/utils/datetime'
 import { serverEnv as env } from '~/server/config/env/env.server';
 import { eq } from 'drizzle-orm';
 import type { CreateUserKeyDto, CreateUserKeySecureDto, UpdateUserKeyDto, UserKeySafety } from '~/shared/dto/user-key.dto';
+import type { Logger } from '~/shared/logger/logger.client';
+import { ProcessStatus } from '~/shared/const';
 
 export const UserKeyService = {
-  async getList(): Promise<UserKeySafety[]> {
-    return await db
-      .select({
-        id: userKeyTable.id,
-        name: userKeyTable.name,
-        userActionId: userKeyTable.userActionId,
-        createdAt: userKeyTable.createdAt,
-        updatedAt: userKeyTable.updatedAt,
-      })
-      .from(userTable)
+  async getList(logger: Logger): Promise<UserKeySafety[]> {
+    try {
+      logger.info('get list from db:: ' + ProcessStatus.PENDING)
+      const rows = await db
+        .select({
+          id: userKeyTable.id,
+          name: userKeyTable.name,
+          userActionId: userKeyTable.userActionId,
+          createdAt: userKeyTable.createdAt,
+          updatedAt: userKeyTable.updatedAt,
+        })
+        .from(userTable)
+      logger.info('get list from db:: ' + ProcessStatus.COMPLETE)
+      return rows
+    }
+    catch (err) {
+      logger.error('get list from db:: ' + ProcessStatus.ERROR, { err })
+      throw err
+    }
   },
 
   async getById(keyId: string): Promise<UserKeySafety> {

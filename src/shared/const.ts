@@ -17,3 +17,7 @@ export enum SessionStatus {
   ACTIVE = 'ACTIVE',
   PENDING = 'PENDING',
 }
+
+export enum CookieName {
+  accessToken = 'accessToken'
+}
