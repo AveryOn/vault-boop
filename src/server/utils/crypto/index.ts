@@ -2,8 +2,8 @@ import crypto, { type CipherGCMTypes } from 'node:crypto'
 import { serverEnv as env } from "~/server/config/env"
 import argon2 from 'argon2'
 
-function getKey(): Buffer {
-  const secret = env.HASH_kEY
+function getDataKey(): Buffer {
+  const secret = env.DATA_HASH_KEY
 
   if (!secret) {
     throw new Error('HASH_KEY is not configured')
@@ -15,11 +15,31 @@ function getKey(): Buffer {
     .digest()
 }
 
-export function encryptData(value: string): string {
+function getAccessKey(): Buffer {
+  const secret = env.ACCESS_HASH_KEY
+
+  if (!secret) {
+    throw new Error('HASH_KEY is not configured')
+  }
+
+  return crypto
+    .createHash('sha256')
+    .update(secret)
+    .digest()
+}
+
+const getKeyMap = {
+  access: getAccessKey,
+  data: getDataKey,
+} as const
+type GetKeyType = keyof typeof getKeyMap
+
+
+export function encryptData(value: string, type: GetKeyType): string {
   const iv = crypto.randomBytes(12)
   const cipher = crypto.createCipheriv(
     env.CIPHER_ALGORITHM as CipherGCMTypes,
-    getKey(),
+    getKeyMap[type](),
     iv
   )
 
@@ -38,7 +58,7 @@ export function encryptData(value: string): string {
 }
 
 
-export function decryptData(value: string): string {
+export function decryptData(value: string, type: GetKeyType): string {
   const [ivBase64, authTagBase64, encryptedBase64] = value.split(':')
 
   if (!ivBase64 || !authTagBase64 || !encryptedBase64) {
@@ -48,7 +68,7 @@ export function decryptData(value: string): string {
 
   const decipher = crypto.createDecipheriv(
     env.CIPHER_ALGORITHM as CipherGCMTypes,
-    getKey(),
+    getKeyMap[type](),
     Buffer.from(ivBase64, 'base64'),
   )
 
