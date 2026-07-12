@@ -15,6 +15,13 @@
       "when": 1783859670790,
       "tag": "0001_melted_dagger",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1783860571430,
+      "tag": "0002_easy_cargill",
+      "breakpoints": true
     }
   ]
 }

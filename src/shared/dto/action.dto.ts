@@ -5,7 +5,7 @@ export type Action = typeof actionTable.$inferSelect
 export type ActionInput = typeof actionTable.$inferInsert
 
 export const createActionDto = z.object({
-  username: z.string().trim().min(3),
+  name: z.string().trim().min(3),
 })
 export type CreateActionDto = z.infer<typeof createActionDto>
 export type CreateActionResponse = Action
