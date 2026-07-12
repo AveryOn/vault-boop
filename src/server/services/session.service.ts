@@ -44,6 +44,7 @@ export const SessionService = {
     return session ?? null
   },
 
+  /** Принудительное завершение всех сессий для пользователя */
   async terminateAllSession(dto: TerminateAllSessionsDto): Promise<boolean> {
     try {
       await db
