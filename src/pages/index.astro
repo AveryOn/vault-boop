@@ -1,12 +1,12 @@
 ---
 import IndexFooter from '~/client/components/common/IndexFooter.vue'
 import IndexHeader from '~/client/components/common/IndexHeader.vue'
-import ResumeView from '~/client/components/resume/ResumeView.vue'
+import VaultAuthView from '~/client/components/vault-auth/VaultAuthView.vue'
 import Layout from '~/client/layouts/Layout.astro'
 ---
 
 <Layout title="Developer Platform">
   <IndexHeader client:only="vue" slot="header" />
-  <ResumeView client:only="vue" slot="main" />
+  <VaultAuthView client:only="vue" slot="main" />
   <IndexFooter client:only="vue" slot="footer" />
 </Layout>
