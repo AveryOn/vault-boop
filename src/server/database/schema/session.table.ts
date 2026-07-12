@@ -14,7 +14,7 @@ export const sessionTable = sqliteTable('session', {
     .notNull()
     .references(() => userTable.id, { onDelete: 'cascade' }),
 
-  lastActionId: text('last_action_id')
+  lastUserActionId: text('last_user_action_id')
     .notNull()
     .references(() => actionTable.id, { onDelete: 'no action' }),
 
