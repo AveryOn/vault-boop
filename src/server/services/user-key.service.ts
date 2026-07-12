@@ -52,7 +52,7 @@ export const UserKeyService = {
       .insert(userKeyTable)
       .values({
         //  TODO ПОСТАВИТЬ РЕАЛЬНУЮ ЗАЩИТУ
-        keyHash: dto.key + env.HASH_kEY,//  TODO ПОСТАВИТЬ РЕАЛЬНУЮ ЗАЩИТУ
+        keyHash: dto.key + env.DATA_HASH_KEY,//  TODO ПОСТАВИТЬ РЕАЛЬНУЮ ЗАЩИТУ
         name: dto.name,
         createdAt: now,
         updatedAt: now,

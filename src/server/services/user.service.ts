@@ -60,7 +60,7 @@ export const UserService = {
         firstName: data.firstName,
         lastName: data.lastName,
         //  TODO ПОСТАВИТЬ РЕАЛЬНУЮ ЗАЩИТУ
-        masterPasswordHash: data.password + env.HASH_kEY, //  TODO ПОСТАВИТЬ РЕАЛЬНУЮ ЗАЩИТУ
+        masterPasswordHash: data.password + env.DATA_HASH_KEY, //  TODO ПОСТАВИТЬ РЕАЛЬНУЮ ЗАЩИТУ
         username: data.username,
         updatedAt: now,
         createdAt: now,
@@ -86,7 +86,7 @@ export const UserService = {
         lastName: data.lastName,
         username: data.username,
         //  TODO ПОСТАВИТЬ РЕАЛЬНУЮ ЗАЩИТУ
-        masterPasswordHash: data.password && data.password + env.HASH_kEY, //  TODO ПОСТАВИТЬ РЕАЛЬНУЮ ЗАЩИТУ
+        masterPasswordHash: data.password && data.password + env.DATA_HASH_KEY, //  TODO ПОСТАВИТЬ РЕАЛЬНУЮ ЗАЩИТУ
         updatedAt: now,
       })
       .where(eq(userTable.id, userId))

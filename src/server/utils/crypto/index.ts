@@ -6,7 +6,7 @@ function getDataKey(): Buffer {
   const secret = env.DATA_HASH_KEY
 
   if (!secret) {
-    throw new Error('HASH_KEY is not configured')
+    throw new Error('DATA_HASH_KEY is not configured')
   }
 
   return crypto
@@ -19,7 +19,7 @@ function getAccessKey(): Buffer {
   const secret = env.ACCESS_HASH_KEY
 
   if (!secret) {
-    throw new Error('HASH_KEY is not configured')
+    throw new Error('ACCESS_HASH_KEY is not configured')
   }
 
   return crypto
