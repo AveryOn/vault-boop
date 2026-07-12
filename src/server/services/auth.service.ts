@@ -30,7 +30,8 @@ export const AuthService = {
 
 
       // STAGE_2 - Проверка пароля
-      logger.info('[STAGE_2]:: ')
+      logger.info('[STAGE_2]:: Check password:: ' + ProcessStatus.PENDING)
+
 
     }
     catch (err) {

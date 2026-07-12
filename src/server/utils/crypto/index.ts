@@ -1,5 +1,6 @@
 import crypto, { type CipherGCMTypes } from 'node:crypto'
 import { serverEnv as env } from "~/server/config/env"
+import argon2 from 'argon2'
 
 function getKey(): Buffer {
   const secret = env.HASH_kEY
@@ -17,7 +18,7 @@ function getKey(): Buffer {
 export function encrypt(value: string): string {
   const iv = crypto.randomBytes(12)
   const cipher = crypto.createCipheriv(
-    env.ALGORITHM as CipherGCMTypes,
+    env.CIPHER_ALGORITHM as CipherGCMTypes,
     getKey(),
     iv
   )
@@ -46,7 +47,7 @@ export function decrypt(value: string): string {
 
 
   const decipher = crypto.createDecipheriv(
-    env.ALGORITHM as CipherGCMTypes,
+    env.CIPHER_ALGORITHM as CipherGCMTypes,
     getKey(),
     Buffer.from(ivBase64, 'base64'),
   )
@@ -60,4 +61,21 @@ export function decrypt(value: string): string {
     ])
 
   return decrypted.toString('utf8')
+}
+
+const algorithmMap = {
+  argon2id: argon2.argon2id,
+  argon2i: argon2.argon2i,
+  argon2d: argon2.argon2d,
+} as const
+
+const algorithm = algorithmMap[env.HASH_ALGORITHM as keyof typeof algorithmMap]
+
+export async function hashPassword(password: string): Promise<string> {
+  return argon2.hash(password, {
+    type: algorithm,
+    memoryCost: 131072,
+    timeCost: 4,
+    parallelism: 1,
+  })
 }
