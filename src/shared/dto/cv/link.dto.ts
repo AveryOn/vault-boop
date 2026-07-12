@@ -22,21 +22,22 @@ export const patchCvLinkDto = z.object({
 })
 export type PatchCvLinkDto = z.infer<typeof patchCvLinkDto>
 
-
 export const reorderLinksDto = z.object({
-  linksOrder: z.array(z.object({
-    id: z.uuid(),
-    order: z.number().min(0),
-    label: z.string().trim().optional()
-  })),
-  profileId: z.uuid()
+  linksOrder: z.array(
+    z.object({
+      id: z.uuid(),
+      order: z.number().min(0),
+      label: z.string().trim().optional(),
+    }),
+  ),
+  profileId: z.uuid(),
 })
 export type ReorderLinksDto = z.infer<typeof reorderLinksDto>
 
 export interface CreateLinkResponse {
-  newLink: Link,
+  newLink: Link
   shiftedLinks: {
-    id: string,
-    order: number,
+    id: string
+    order: number
   }[]
 }

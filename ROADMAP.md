@@ -6,40 +6,40 @@
 
 PWA для телефона:
 
-* адаптивный интерфейс;
-* установка на домашний экран;
-* offline-режим;
-* Service Worker;
-* локальный зашифрованный кэш;
-* позже можно обернуть в Capacitor.
+- адаптивный интерфейс;
+- установка на домашний экран;
+- offline-режим;
+- Service Worker;
+- локальный зашифрованный кэш;
+- позже можно обернуть в Capacitor.
 
 ### 2. Основные функции MVP
 
-* регистрация и вход;
-* master password;
-* список записей;
-* создание, редактирование, удаление;
-* поля:
+- регистрация и вход;
+- master password;
+- список записей;
+- создание, редактирование, удаление;
+- поля:
+  - title;
+  - username;
+  - password;
+  - URL;
+  - notes;
 
-  * title;
-  * username;
-  * password;
-  * URL;
-  * notes;
-* генератор паролей;
-* поиск;
-* копирование логина и пароля;
-* автоматическая блокировка vault;
-* экспорт и импорт зашифрованной резервной копии.
+- генератор паролей;
+- поиск;
+- копирование логина и пароля;
+- автоматическая блокировка vault;
+- экспорт и импорт зашифрованной резервной копии.
 
 Пока без:
 
-* sharing;
-* организаций;
-* browser autofill;
-* командного доступа;
-* восстановления master password;
-* сложной синхронизации конфликтов.
+- sharing;
+- организаций;
+- browser autofill;
+- командного доступа;
+- восстановления master password;
+- сложной синхронизации конфликтов.
 
 ### 3. Ключевой принцип безопасности
 
@@ -77,27 +77,27 @@ updatedAt
 
 Нужно разделить:
 
-* `auth password hash` — для входа;
-* `encryption key` — для расшифровки vault.
+- `auth password hash` — для входа;
+- `encryption key` — для расшифровки vault.
 
 Лучше использовать:
 
-* Argon2id для derivation;
-* AES-256-GCM для шифрования;
-* случайный `salt`;
-* случайный `nonce/iv`;
-* Web Crypto API;
-* HttpOnly Secure SameSite cookies;
-* CSRF-защиту;
-* rate limiting.
+- Argon2id для derivation;
+- AES-256-GCM для шифрования;
+- случайный `salt`;
+- случайный `nonce/iv`;
+- Web Crypto API;
+- HttpOnly Secure SameSite cookies;
+- CSRF-защиту;
+- rate limiting.
 
 Не хранить ключ:
 
-* в localStorage;
-* в базе;
-* в cookies;
-* в логах;
-* в analytics.
+- в localStorage;
+- в базе;
+- в cookies;
+- в логах;
+- в analytics.
 
 Ключ держать только в памяти приложения. После блокировки — удалять.
 
@@ -127,22 +127,22 @@ packages/
 
 Frontend:
 
-* React или Vue;
-* Vite;
-* TypeScript;
-* IndexedDB;
-* Web Crypto API;
-* PWA plugin.
+- React или Vue;
+- Vite;
+- TypeScript;
+- IndexedDB;
+- Web Crypto API;
+- PWA plugin.
 
 Backend:
 
-* Node.js;
-* NestJS или Fastify;
-* PostgreSQL;
-* Redis для rate limiting и сессий;
-* Docker;
-* Nginx;
-* HTTPS.
+- Node.js;
+- NestJS или Fastify;
+- PostgreSQL;
+- Redis для rate limiting и сессий;
+- Docker;
+- Nginx;
+- HTTPS.
 
 ### 6. Минимальная модель записи
 
@@ -190,13 +190,13 @@ interface Vault {
 
 ### 8. Важные UX-функции для телефона
 
-* разблокировка по PIN только как локальная обёртка;
-* позже WebAuthn / biometrics;
-* пароль скрыт по умолчанию;
-* очистка clipboard через 20–30 секунд;
-* автоматическая блокировка через 1–5 минут;
-* запрет скриншотов в PWA почти невозможно гарантировать;
-* предупреждение при слабом master password.
+- разблокировка по PIN только как локальная обёртка;
+- позже WebAuthn / biometrics;
+- пароль скрыт по умолчанию;
+- очистка clipboard через 20–30 секунд;
+- автоматическая блокировка через 1–5 минут;
+- запрет скриншотов в PWA почти невозможно гарантировать;
+- предупреждение при слабом master password.
 
 ### 9. Этапы разработки
 

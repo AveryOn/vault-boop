@@ -43,12 +43,8 @@ const languageOptions = [
   },
 ]
 
-const {
-  errors,
-  isSomeError,
-  undoError,
-  validateFormOrThrow,
-} = useFormValidator(formData)
+const { errors, isSomeError, undoError, validateFormOrThrow } =
+  useFormValidator(formData)
 
 const toast = useToast()
 
@@ -94,45 +90,106 @@ async function submit() {
     <form class="profile-new-form relative" @submit.prevent>
       <div class="flex flex-col w-[50%] gap-[18px]">
         <!-- TITLE -->
-        <InputUI v-model="formData.title" type="text" :error="errors.title" label="Profile Title"
-          placeholder="The coolest profile!" @input="undoError('title')" />
+        <InputUI
+          v-model="formData.title"
+          type="text"
+          :error="errors.title"
+          label="Profile Title"
+          placeholder="The coolest profile!"
+          @input="undoError('title')"
+        />
         <!-- FIRST NAME -->
-        <InputUI v-model="formData.firstName" type="text" :error="errors.firstName" label="First Name"
-          placeholder="Alex" @input="undoError('firstName')" />
+        <InputUI
+          v-model="formData.firstName"
+          type="text"
+          :error="errors.firstName"
+          label="First Name"
+          placeholder="Alex"
+          @input="undoError('firstName')"
+        />
         <!-- LAST NAME -->
-        <InputUI v-model="formData.lastName" type="text" :error="errors.lastName" label="Last Name" placeholder="Mercer"
-          @input="undoError('lastName')" />
+        <InputUI
+          v-model="formData.lastName"
+          type="text"
+          :error="errors.lastName"
+          label="Last Name"
+          placeholder="Mercer"
+          @input="undoError('lastName')"
+        />
         <!-- LANGUAGE -->
-        <SelectInputUI v-model="formData.language" :error="errors.language" :options="languageOptions"
-          label="Profile Language" @input="undoError('language')" />
+        <SelectInputUI
+          v-model="formData.language"
+          :error="errors.language"
+          :options="languageOptions"
+          label="Profile Language"
+          @input="undoError('language')"
+        />
         <!-- LOCATION -->
-        <InputUI id="location" v-model="formData.location" :error="errors.location" label="Location"
-          placeholder="Tbilisi, Georgia" @input="undoError('location')" />
+        <InputUI
+          id="location"
+          v-model="formData.location"
+          :error="errors.location"
+          label="Location"
+          placeholder="Tbilisi, Georgia"
+          @input="undoError('location')"
+        />
       </div>
 
       <div class="px-[4px] bg-[--primary-color-4] top-0 bottom-0"></div>
 
       <div class="flex flex-col w-[50%] gap-[18px]">
         <!-- IS ACTIVE PROFILE -->
-        <CheckboxUI id="profile-is-active" v-model="formData.isActive" :error="errors.isActive" label="Active profile"
-          @input="undoError('isActive')" />
+        <CheckboxUI
+          id="profile-is-active"
+          v-model="formData.isActive"
+          :error="errors.isActive"
+          label="Active profile"
+          @input="undoError('isActive')"
+        />
         <!-- PHONE NUMBER -->
-        <PhoneInputUI id="profile-phone" v-model="formData.phone" label="Phone Number" placeholder="+33 6 12 34 56 78"
-          default-country="FR" :error="errors.phone" @phone-change="(payload) => console.log(payload)"
-          @input="undoError('phone')" />
+        <PhoneInputUI
+          id="profile-phone"
+          v-model="formData.phone"
+          label="Phone Number"
+          placeholder="+33 6 12 34 56 78"
+          default-country="FR"
+          :error="errors.phone"
+          @phone-change="(payload) => console.log(payload)"
+          @input="undoError('phone')"
+        />
         <!-- EMAIL -->
-        <EmailInputUI id="profile-email" v-model="formData.email" label="Email" placeholder="your@email.com"
-          hint="Used as contact email in CV profile." :error="errors.email" :required="false"
-          @email-change="(payload) => console.log(payload)" @input="undoError('email')" />
+        <EmailInputUI
+          id="profile-email"
+          v-model="formData.email"
+          label="Email"
+          placeholder="your@email.com"
+          hint="Used as contact email in CV profile."
+          :error="errors.email"
+          :required="false"
+          @email-change="(payload) => console.log(payload)"
+          @input="undoError('email')"
+        />
         <!-- SUMMARY -->
-        <TextareaUI id="summary" v-model="formData.summary" :error="errors.summary"
-          placeholder="Write profile summary..." label="Summary"
+        <TextareaUI
+          id="summary"
+          v-model="formData.summary"
+          :error="errors.summary"
+          placeholder="Write profile summary..."
+          label="Summary"
           description="Short professional summary that will be shown in your CV profile."
-          @input="undoError('summary')" />
+          @input="undoError('summary')"
+        />
       </div>
     </form>
-    <ButtonBaseUI class="w-[30%]" type="submit" variant="primary" :disabled="isSomeError || isSubmitDisabled"
-      :loading="isSubmitLoading" @click="submit">Save profile</ButtonBaseUI>
+    <ButtonBaseUI
+      class="w-[30%]"
+      type="submit"
+      variant="primary"
+      :disabled="isSomeError || isSubmitDisabled"
+      :loading="isSubmitLoading"
+      @click="submit"
+      >Save profile</ButtonBaseUI
+    >
   </section>
 </template>
 

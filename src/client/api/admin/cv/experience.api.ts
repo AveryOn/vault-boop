@@ -1,6 +1,9 @@
 import { httpClient } from '~/client/api/http-client'
 import { _ } from '~/shared/const'
-import type { CreateExperienceDto, Experience } from '~/shared/dto/cv/experience.dto'
+import type {
+  CreateExperienceDto,
+  Experience,
+} from '~/shared/dto/cv/experience.dto'
 import { AppRoutes } from '~/shared/router'
 
 const routes = AppRoutes.api.admin
@@ -34,5 +37,4 @@ export const CvExperienceApi = {
   //   const result = await httpClient.patch<{ data: boolean }>(routes.cvLinkByUuid(linkId), data)
   //   return result.data
   // }
-
 }

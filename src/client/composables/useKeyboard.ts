@@ -1,5 +1,5 @@
 import { onBeforeUnmount, onMounted, unref, type MaybeRef } from 'vue'
-import { _ } from '~/shared/const';
+import { _ } from '~/shared/const'
 
 export type KeyboardKey =
   | 'esc'
@@ -19,7 +19,9 @@ export type KeyboardShortcut =
 
 export type KeyboardCallback = (event: KeyboardEvent) => void
 
-export type KeyboardHandlers = Partial<Record<KeyboardShortcut, KeyboardCallback>>
+export type KeyboardHandlers = Partial<
+  Record<KeyboardShortcut, KeyboardCallback>
+>
 
 export type UseKeyboardOptions = {
   enabled?: MaybeRef<boolean>

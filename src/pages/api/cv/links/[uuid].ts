@@ -1,11 +1,10 @@
-import type { APIRoute } from "astro"
-import z from "zod"
-import { ZodBundleErrors } from "~/server/plugins/zod.plugin"
-import { CvLinkService } from "~/server/services/admin/cv/link.service"
-import { _ } from "~/shared/const"
-import { patchCvLinkDto } from "~/shared/dto/cv/link.dto"
-import { Logger } from "~/shared/logger/logger.client"
-
+import type { APIRoute } from 'astro'
+import z from 'zod'
+import { ZodBundleErrors } from '~/server/plugins/zod.plugin'
+import { CvLinkService } from '~/server/services/admin/cv/link.service'
+import { _ } from '~/shared/const'
+import { patchCvLinkDto } from '~/shared/dto/cv/link.dto'
+import { Logger } from '~/shared/logger/logger.client'
 
 export const PATCH: APIRoute = async ({ params, request }) => {
   const logger = new Logger('HTTP:PATCH:UPDATE_PROFILE_LINK')

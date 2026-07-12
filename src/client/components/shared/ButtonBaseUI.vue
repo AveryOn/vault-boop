@@ -36,16 +36,26 @@ function handleClick(event: MouseEvent) {
 </script>
 
 <template>
-  <button :type="type" class="base-button" :class="[
-    `base-button--${variant}`,
-    `base-button--${size}`,
-    {
-      'base-button--disabled': disabled,
-      'base-button--loading': loading,
-      'base-button--full-width': fullWidth,
-    },
-  ]" :disabled="disabled || loading" @click="handleClick">
-    <span v-if="loading" class="base-button__loader" aria-hidden="true" />
+  <button
+    :type="type"
+    class="base-button"
+    :class="[
+      `base-button--${variant}`,
+      `base-button--${size}`,
+      {
+        'base-button--disabled': disabled,
+        'base-button--loading': loading,
+        'base-button--full-width': fullWidth,
+      },
+    ]"
+    :disabled="disabled || loading"
+    @click="handleClick"
+  >
+    <span
+      v-if="loading"
+      class="base-button__loader"
+      aria-hidden="true"
+    />
 
     <span class="base-button__content">
       <slot />

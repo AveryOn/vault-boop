@@ -133,12 +133,13 @@ export function useFormValidator<TForm extends object>(form: TForm) {
     dto: z.ZodObject<T>,
     form: TForm,
     error?: (errDetails: object) => void,
-
   ) {
     const data = dto.safeParse(form)
 
     if (!data.success) {
-      const details = z.treeifyError(data.error) as ZodErrorCustomDetails<TForm>
+      const details = z.treeifyError(
+        data.error,
+      ) as ZodErrorCustomDetails<TForm>
       setErrors(details)
       console.debug(details, data.error)
       error?.(details)

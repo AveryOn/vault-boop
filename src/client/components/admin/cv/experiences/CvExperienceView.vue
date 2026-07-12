@@ -1,16 +1,24 @@
 <script setup lang="ts">
-import { useCvExperienceEditor } from '~/client/composables/useCvExperienceEditor';
-import SelectInputUI from '~/client/components/shared/SelectInputUI.vue';
-import { mdiChevronDownBoxOutline, mdiChevronUpBoxOutline, mdiHandOkay, mdiPen, mdiUndo } from '@mdi/js';
-import Icon from '~/client/components/common/Icon.vue';
-import ButtonBaseUI from '~/client/components/shared/ButtonBaseUI.vue';
-import { computed, onMounted, ref } from 'vue';
-import type { EmploymentType } from '~/shared/dto/cv/employment-type.dto';
-import { CVEmploymentType, CVEmploymentTypeDisplay } from '~/shared/types';
-import CheckboxUI from '~/client/components/shared/CheckboxUI.vue';
-import InputUI from '~/client/components/shared/InputUI.vue';
-import { CvEmploymentTypeApi } from '~/client/api/admin/cv/employment-type.api';
-
+import { useCvExperienceEditor } from '~/client/composables/useCvExperienceEditor'
+import SelectInputUI from '~/client/components/shared/SelectInputUI.vue'
+import {
+  mdiChevronDownBoxOutline,
+  mdiChevronUpBoxOutline,
+  mdiHandOkay,
+  mdiPen,
+  mdiUndo,
+} from '@mdi/js'
+import Icon from '~/client/components/common/Icon.vue'
+import ButtonBaseUI from '~/client/components/shared/ButtonBaseUI.vue'
+import { computed, onMounted, ref } from 'vue'
+import type { EmploymentType } from '~/shared/dto/cv/employment-type.dto'
+import {
+  CVEmploymentType,
+  CVEmploymentTypeDisplay,
+} from '~/shared/types'
+import CheckboxUI from '~/client/components/shared/CheckboxUI.vue'
+import InputUI from '~/client/components/shared/InputUI.vue'
+import { CvEmploymentTypeApi } from '~/client/api/admin/cv/employment-type.api'
 
 const {
   profiles,
@@ -44,7 +52,8 @@ const employmentTypes = ref<EmploymentType[]>([])
 const EmploymentTypes = computed(() => {
   return employmentTypes.value.map((v) => {
     return {
-      label: CVEmploymentTypeDisplay[v.code as keyof typeof CVEmploymentType],
+      label:
+        CVEmploymentTypeDisplay[v.code as keyof typeof CVEmploymentType],
       value: v.id,
     }
   })
@@ -52,39 +61,66 @@ const EmploymentTypes = computed(() => {
 
 const employmentTypeLabel = computed(() => {
   const val = editExperienceFormData.value['employmentTypeId']?.oldValue
-  return employmentTypes.value.find(v => v.id === val)?.label
+  return employmentTypes.value.find((v) => v.id === val)?.label
 })
 
 onMounted(async () => {
   console.debug(editExperienceFormData)
   employmentTypes.value = await CvEmploymentTypeApi.getList()
 })
-
 </script>
 
 <template>
   <section class="cv-admin__experience">
     <div class="flex flex-col gap-[24px] min-w-[360px] w-[800px]">
-      <SelectInputUI v-model="selectedProfileId" :options="profiles" :placeholder="'Select Profile'"
-        @input="() => { }" />
+      <SelectInputUI
+        v-model="selectedProfileId"
+        :options="profiles"
+        :placeholder="'Select Profile'"
+        @input="() => {}"
+      />
 
       <!-- SEPARATOR -->
       <div class="w-full h-[4px] bg-[--primary-color-5]"></div>
 
-      <div class="relative flex items-start justify-center h-[100%] gap-[24px]">
-        <div v-if="selectedExperience && experiencesByProfileId.length > 1"
-          class="absolute left-[-36px] top-0 bottom-0 flex flex-col justify-between">
-          <Icon class="move-experience-btn" :size="28" :icon="mdiChevronUpBoxOutline"
-            @click="() => moveExperience('up')">
+      <div
+        class="relative flex items-start justify-center h-[100%] gap-[24px]"
+      >
+        <div
+          v-if="selectedExperience && experiencesByProfileId.length > 1"
+          class="absolute left-[-36px] top-0 bottom-0 flex flex-col justify-between"
+        >
+          <Icon
+            class="move-experience-btn"
+            :size="28"
+            :icon="mdiChevronUpBoxOutline"
+            @click="() => moveExperience('up')"
+          >
           </Icon>
-          <Icon class="move-experience-btn" :size="28" :icon="mdiChevronDownBoxOutline" @click="moveExperience('down')">
+          <Icon
+            class="move-experience-btn"
+            :size="28"
+            :icon="mdiChevronDownBoxOutline"
+            @click="moveExperience('down')"
+          >
           </Icon>
         </div>
 
-        <TransitionGroup tag="ul" name="experience-list" class="flex flex-col gap-[10px] w-[50%]">
-          <li v-for="experience in experiencesByProfileId" :key="experience.id" class="experience-item"
-            :class="{ 'bg-[--primary-color-3-100]': experience.id === selectedExperience?.id }"
-            @click="() => selectExperience(experience)">
+        <TransitionGroup
+          tag="ul"
+          name="experience-list"
+          class="flex flex-col gap-[10px] w-[50%]"
+        >
+          <li
+            v-for="experience in experiencesByProfileId"
+            :key="experience.id"
+            class="experience-item"
+            :class="{
+              'bg-[--primary-color-3-100]':
+                experience.id === selectedExperience?.id,
+            }"
+            @click="() => selectExperience(experience)"
+          >
             <span>{{ experience }}</span>
 
             <div class="experience-item__actions">
@@ -95,31 +131,60 @@ onMounted(async () => {
 
         <!-- SEPARATOR -->
         <Transition name="separator">
-          <div v-if="selectedExperience" class="experience-separator"></div>
+          <div
+            v-if="selectedExperience"
+            class="experience-separator"
+          ></div>
         </Transition>
 
         <Transition name="experience-editor">
-          <div v-if="selectedExperience" class="w-[50%] experience-edit-overlay">
+          <div
+            v-if="selectedExperience"
+            class="w-[50%] experience-edit-overlay"
+          >
             <form class="experience-edit-form" @submit.prevent>
-
               <!-- COMPANY FIELD -->
               <div class="experience-edit-item">
                 <div class="flex items-center justify-between">
                   <p class="experience-edit-item__key">Company:</p>
 
-                  <InputUI v-if="editExperienceFormData['company']?.focused"
-                    v-model="editExperienceFormData['company']!.newValue! as string" size="xsmall" class="w-[50%]!"
-                    placeholder="Label">
+                  <InputUI
+                    v-if="editExperienceFormData['company']?.focused"
+                    v-model="
+                      editExperienceFormData['company']!
+                        .newValue! as string
+                    "
+                    size="xsmall"
+                    class="w-[50%]!"
+                    placeholder="Label"
+                  >
                   </InputUI>
-                  <p v-else class="experience-edit-item__value" @click="() => setFieldFocus('company', true)">
+                  <p
+                    v-else
+                    class="experience-edit-item__value"
+                    @click="() => setFieldFocus('company', true)"
+                  >
                     {{ editExperienceFormData.company?.oldValue }}
                   </p>
 
                   <div class="experience-edit-item__actions">
-                    <Icon class="action-btn" :icon="mdiUndo" :size="26" @click="() => undoChanges('company')" />
-                    <span v-if="editExperienceFormData!['company']?.loading" class="base-button__loader" />
-                    <Icon v-else class="action-btn" :icon="mdiHandOkay" :size="26"
-                      @click="() => confirmUpdateField('company')" />
+                    <Icon
+                      class="action-btn"
+                      :icon="mdiUndo"
+                      :size="26"
+                      @click="() => undoChanges('company')"
+                    />
+                    <span
+                      v-if="editExperienceFormData!['company']?.loading"
+                      class="base-button__loader"
+                    />
+                    <Icon
+                      v-else
+                      class="action-btn"
+                      :icon="mdiHandOkay"
+                      :size="26"
+                      @click="() => confirmUpdateField('company')"
+                    />
                   </div>
                 </div>
               </div>
@@ -127,22 +192,56 @@ onMounted(async () => {
               <!-- EMPLOYMENT TYPE ID FIELD -->
               <div class="experience-edit-item">
                 <div class="flex items-center justify-between">
-                  <p class="experience-edit-item__key">Employment Type:</p>
+                  <p class="experience-edit-item__key">
+                    Employment Type:
+                  </p>
 
-                  <SelectInputUI v-if="editExperienceFormData['employmentTypeId']?.focused"
-                    v-model="editExperienceFormData['employmentTypeId'].newValue!" class="w-[50%]!"
-                    :options="EmploymentTypes" size="xsmall">
+                  <SelectInputUI
+                    v-if="
+                      editExperienceFormData['employmentTypeId']?.focused
+                    "
+                    v-model="
+                      editExperienceFormData['employmentTypeId']
+                        .newValue!
+                    "
+                    class="w-[50%]!"
+                    :options="EmploymentTypes"
+                    size="xsmall"
+                  >
                   </SelectInputUI>
-                  <p v-else class="experience-edit-item__value" @click="() => setFieldFocus('employmentTypeId', true)">
+                  <p
+                    v-else
+                    class="experience-edit-item__value"
+                    @click="
+                      () => setFieldFocus('employmentTypeId', true)
+                    "
+                  >
                     {{ employmentTypeLabel }}
                   </p>
 
                   <div class="experience-edit-item__actions">
-                    <Icon class="action-btn" :icon="mdiUndo" :size="26"
-                      @click="() => undoChanges('employmentTypeId')" />
-                    <span v-if="editExperienceFormData!['employmentTypeId']?.loading" class="base-button__loader" />
-                    <Icon v-else class="action-btn" :icon="mdiHandOkay" :size="26"
-                      @click="() => confirmUpdateField('employmentTypeId')" />
+                    <Icon
+                      class="action-btn"
+                      :icon="mdiUndo"
+                      :size="26"
+                      @click="() => undoChanges('employmentTypeId')"
+                    />
+                    <span
+                      v-if="
+                        editExperienceFormData!['employmentTypeId']
+                          ?.loading
+                      "
+                      class="base-button__loader"
+                    />
+                    <Icon
+                      v-else
+                      class="action-btn"
+                      :icon="mdiHandOkay"
+                      :size="26"
+                      @click="
+                        () => confirmUpdateField('employmentTypeId')
+                      "
+                    />
                   </div>
                 </div>
               </div>
@@ -152,13 +251,33 @@ onMounted(async () => {
                 <div class="flex items-center justify-between">
                   <p class="experience-edit-item__key">Is Current:</p>
 
-                  <CheckboxUI v-model="editExperienceFormData['isCurrent']!.newValue! as boolean" />
+                  <CheckboxUI
+                    v-model="
+                      editExperienceFormData['isCurrent']!
+                        .newValue! as boolean
+                    "
+                  />
 
                   <div class="experience-edit-item__actions">
-                    <Icon class="action-btn" :icon="mdiUndo" :size="26" @click="() => undoChanges('isCurrent')" />
-                    <span v-if="editExperienceFormData!['isCurrent']?.loading" class="base-button__loader" />
-                    <Icon v-else class="action-btn" :icon="mdiHandOkay" :size="26"
-                      @click="() => confirmUpdateField('isCurrent')" />
+                    <Icon
+                      class="action-btn"
+                      :icon="mdiUndo"
+                      :size="26"
+                      @click="() => undoChanges('isCurrent')"
+                    />
+                    <span
+                      v-if="
+                        editExperienceFormData!['isCurrent']?.loading
+                      "
+                      class="base-button__loader"
+                    />
+                    <Icon
+                      v-else
+                      class="action-btn"
+                      :icon="mdiHandOkay"
+                      :size="26"
+                      @click="() => confirmUpdateField('isCurrent')"
+                    />
                   </div>
                 </div>
               </div>
@@ -167,13 +286,26 @@ onMounted(async () => {
         </Transition>
       </div>
 
-      <TransitionGroup tag="div" name="experience-actions" class="w-full flex justify-center gap-[14px]">
-        <ButtonBaseUI v-if="experienceAreReordered" key="save-order" :loading="isSaveReorderLoading"
-          @click="saveNewOrder">
+      <TransitionGroup
+        tag="div"
+        name="experience-actions"
+        class="w-full flex justify-center gap-[14px]"
+      >
+        <ButtonBaseUI
+          v-if="experienceAreReordered"
+          key="save-order"
+          :loading="isSaveReorderLoading"
+          @click="saveNewOrder"
+        >
           Save New Order
         </ButtonBaseUI>
 
-        <ButtonBaseUI v-if="experienceAreReordered" key="reset-order" :variant="'secondary'" @click="resetChangesOrder">
+        <ButtonBaseUI
+          v-if="experienceAreReordered"
+          key="reset-order"
+          :variant="'secondary'"
+          @click="resetChangesOrder"
+        >
           Reset Order
         </ButtonBaseUI>
 
@@ -181,16 +313,24 @@ onMounted(async () => {
           * Create New *
         </ButtonBaseUI>
 
-        <ButtonBaseUI v-if="someChange" key="commit-changes" @click="submitFormChanges">
+        <ButtonBaseUI
+          v-if="someChange"
+          key="commit-changes"
+          @click="submitFormChanges"
+        >
           Commit Changes
         </ButtonBaseUI>
 
-        <ButtonBaseUI v-if="someChange" key="reset-changes" :variant="'secondary'" @click="resetFormChanges">
+        <ButtonBaseUI
+          v-if="someChange"
+          key="reset-changes"
+          :variant="'secondary'"
+          @click="resetFormChanges"
+        >
           Reset Changes
         </ButtonBaseUI>
       </TransitionGroup>
     </div>
-
   </section>
 </template>
 
@@ -204,7 +344,6 @@ onMounted(async () => {
   border: 1px dashed var(--border-color-1);
   padding: 24px 48px;
 }
-
 
 .move-experience-btn {
   color: var(--primary-color-4);
@@ -312,7 +451,6 @@ onMounted(async () => {
     transform: rotate(360deg);
   }
 }
-
 
 /*--------------------------------------------------- */
 .experience-list-move {

@@ -2,7 +2,7 @@
 import { AppRoutes } from '~/shared/router'
 import type {
   Experience,
-  ExperienceInput
+  ExperienceInput,
 } from '~/shared/dto/cv/experience.dto'
 import { useCvEntityEditor } from '~/client/composables/useCvEntityEditor'
 import { CvExperienceApi } from '~/client/api/admin/cv/experience.api'
@@ -24,7 +24,7 @@ export function useCvExperienceEditor() {
       'endDate',
     ],
 
-    getLabel: experience => experience.company,
+    getLabel: (experience) => experience.company,
 
     createPageUrl: AppRoutes.admin.CvExperienceNew,
 

@@ -1,6 +1,15 @@
-import { cvProfileLinkTable, cvProfileTable } from '~/server/database/schema'
+import {
+  cvProfileLinkTable,
+  cvProfileTable,
+} from '~/server/database/schema'
 import { db } from '~/server/database/client'
-import type { CreateCvLinkDto, CreateLinkResponse, Link, PatchCvLinkDto, ReorderLinksDto } from '~/shared/dto/cv/link.dto'
+import type {
+  CreateCvLinkDto,
+  CreateLinkResponse,
+  Link,
+  PatchCvLinkDto,
+  ReorderLinksDto,
+} from '~/shared/dto/cv/link.dto'
 import { and, asc, eq } from 'drizzle-orm'
 import { dateISO } from '~/shared/utils/datetime'
 import type { Logger } from '~/shared/logger/logger.client'
@@ -16,7 +25,10 @@ export const CvLinkService = {
       .orderBy(asc(cvProfileLinkTable.order))
   },
 
-  async create(dto: CreateCvLinkDto, logger?: Logger): Promise<CreateLinkResponse> {
+  async create(
+    dto: CreateCvLinkDto,
+    logger?: Logger,
+  ): Promise<CreateLinkResponse> {
     return await db.transaction(async (tx) => {
       const now = dateISO()
 
@@ -29,19 +41,20 @@ export const CvLinkService = {
         .where(
           and(
             eq(cvProfileLinkTable.profileId, dto.profileId),
-            eq(cvProfileLinkTable.label, dto.label)
-          )
+            eq(cvProfileLinkTable.label, dto.label),
+          ),
         )
         .limit(1)
-
 
       // Если такая ссылка уже существует для этого профиля
       if (existingLink) {
         logger?.error('[CONFLICT] Such a link already exists', {
           profileId: existingLink.profileId,
-          label: existingLink.label
+          label: existingLink.label,
         })
-        throw new Error('Conflict', { cause: 'Such a link already exists' })
+        throw new Error('Conflict', {
+          cause: 'Such a link already exists',
+        })
       }
 
       logger?.info(`Get list by Profile ${dto.profileId}:: PENDING`)
@@ -52,12 +65,11 @@ export const CvLinkService = {
           id: cvProfileLinkTable.id,
         })
         .from(cvProfileLinkTable)
-        .where(
-          eq(cvProfileLinkTable.profileId, dto.profileId),
-        )
+        .where(eq(cvProfileLinkTable.profileId, dto.profileId))
 
-      logger?.info(`Get list by Profile ${dto.profileId}:: COMPLETE`, { count: linksOnProfile.length })
-
+      logger?.info(`Get list by Profile ${dto.profileId}:: COMPLETE`, {
+        count: linksOnProfile.length,
+      })
 
       logger?.info('Reorder links:: PENDING')
       const shiftedLinks = linksOnProfile.map((link) => {
@@ -66,19 +78,17 @@ export const CvLinkService = {
       })
       logger?.info('Reorder links:: COMPLETE', { shiftedLinks })
 
-
       // Фиксирование индексов порядка для всех остальных link в профиле
       logger?.info('Reorder links COMMIT:: PENDING')
       for (const link of linksOnProfile) {
         await tx
           .update(cvProfileLinkTable)
           .set({
-            order: link.order
+            order: link.order,
           })
           .where(eq(cvProfileLinkTable.id, link.id))
       }
       logger?.info('Reorder links COMMIT:: COMPLETE')
-
 
       logger?.info('Create new link:: PENDING')
       const [newLink] = await tx
@@ -102,12 +112,16 @@ export const CvLinkService = {
 
       return {
         newLink,
-        shiftedLinks: shiftedLinks
+        shiftedLinks: shiftedLinks,
       }
     })
   },
 
-  async patch(linkId: string, dto: PatchCvLinkDto, logger?: Logger): Promise<boolean> {
+  async patch(
+    linkId: string,
+    dto: PatchCvLinkDto,
+    logger?: Logger,
+  ): Promise<boolean> {
     return await db.transaction(async (tx) => {
       try {
         // Получение объекта ссылки
@@ -115,14 +129,14 @@ export const CvLinkService = {
         const [link] = await tx
           .select()
           .from(cvProfileLinkTable)
-          .where(
-            eq(cvProfileLinkTable.id, linkId)
-          )
+          .where(eq(cvProfileLinkTable.id, linkId))
           .limit(1)
 
         // Если ссылки с таким ID не существует
         if (!link) {
-          logger?.info('Get Link by ID:: ' + ProcessStatus.ERROR, { status: HttpStatusCode.NotFound })
+          logger?.info('Get Link by ID:: ' + ProcessStatus.ERROR, {
+            status: HttpStatusCode.NotFound,
+          })
           return false
         }
         logger?.info('Get Link by ID:: ' + ProcessStatus.COMPLETE)
@@ -132,58 +146,58 @@ export const CvLinkService = {
         await tx
           .update(cvProfileLinkTable)
           .set({ ...dto })
-          .where(
-            eq(cvProfileLinkTable.id, link.id)
-          )
+          .where(eq(cvProfileLinkTable.id, link.id))
           .returning()
 
         logger?.info('Patch Link:: ' + ProcessStatus.COMPLETE)
         return true
-      }
-      catch (err) {
+      } catch (err) {
         logger?.error(ProcessStatus.ERROR, { error: err })
         return false
       }
     })
   },
 
-  async reorder(dto: ReorderLinksDto, logger?: Logger): Promise<boolean> {
+  async reorder(
+    dto: ReorderLinksDto,
+    logger?: Logger,
+  ): Promise<boolean> {
     return await db.transaction(async (tx) => {
       try {
-        logger?.info('Get Profile:: PENDING', { profileId: dto.profileId })
+        logger?.info('Get Profile:: PENDING', {
+          profileId: dto.profileId,
+        })
 
         // GET PROFILE
-        const [profile] = await tx.
-          select()
+        const [profile] = await tx
+          .select()
           .from(cvProfileTable)
-          .where(
-            eq(cvProfileTable.id, dto.profileId)
-          )
+          .where(eq(cvProfileTable.id, dto.profileId))
           .limit(1)
 
         if (!profile) {
-          logger?.error('Get Profile:: ERROR', { msg: 'Profile not found' })
+          logger?.error('Get Profile:: ERROR', {
+            msg: 'Profile not found',
+          })
           throw new Error('Profile not found')
         }
         logger?.info('Get Profile:: COMPLETE')
-
 
         logger?.info('Reorder Links:: PENDING')
         for (const link of dto.linksOrder) {
           await tx
             .update(cvProfileLinkTable)
             .set({
-              order: link.order
+              order: link.order,
             })
             .where(eq(cvProfileLinkTable.id, link.id))
         }
         logger?.info('Reorder Links:: COMPLETE')
         return true
-      }
-      catch (err) {
+      } catch (err) {
         logger?.error('Reorder Error', { error: err })
         return false
       }
     })
-  }
+  },
 }

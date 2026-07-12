@@ -1,6 +1,10 @@
 import { cvExperienceTable } from '~/server/database/schema'
 import { db } from '~/server/database/client'
-import type { CreateExperienceDto, CreateExperienceResponse, Experience } from '~/shared/dto/cv/experience.dto'
+import type {
+  CreateExperienceDto,
+  CreateExperienceResponse,
+  Experience,
+} from '~/shared/dto/cv/experience.dto'
 import type { Logger } from '~/shared/logger/logger.client'
 import { dateISO } from '~/shared/utils/datetime'
 import { and, eq } from 'drizzle-orm'
@@ -10,7 +14,10 @@ export const CvExperienceService = {
     return await db.select().from(cvExperienceTable)
   },
 
-  async create(dto: CreateExperienceDto, logger?: Logger): Promise<CreateExperienceResponse> {
+  async create(
+    dto: CreateExperienceDto,
+    logger?: Logger,
+  ): Promise<CreateExperienceResponse> {
     return await db.transaction(async (tx) => {
       const now = dateISO()
 
@@ -23,8 +30,8 @@ export const CvExperienceService = {
         .where(
           and(
             eq(cvExperienceTable.profileId, dto.profileId),
-            eq(cvExperienceTable.company, dto.company)
-          )
+            eq(cvExperienceTable.company, dto.company),
+          ),
         )
         .limit(1)
 
@@ -32,9 +39,11 @@ export const CvExperienceService = {
       if (existingExperience) {
         logger?.error('[CONFLICT] Such a experience already exists', {
           profileId: existingExperience.profileId,
-          company: existingExperience.company
+          company: existingExperience.company,
         })
-        throw new Error('Conflict', { cause: 'Such a experience already exists' })
+        throw new Error('Conflict', {
+          cause: 'Such a experience already exists',
+        })
       }
 
       logger?.info(`Get list by Profile ${dto.profileId}:: PENDING`)
@@ -45,20 +54,20 @@ export const CvExperienceService = {
           id: cvExperienceTable.id,
         })
         .from(cvExperienceTable)
-        .where(
-          eq(cvExperienceTable.profileId, dto.profileId),
-        )
+        .where(eq(cvExperienceTable.profileId, dto.profileId))
 
-      logger?.info(`Get list by Profile ${dto.profileId}:: COMPLETE`, { count: experiencesOnProfile.length })
-
+      logger?.info(`Get list by Profile ${dto.profileId}:: COMPLETE`, {
+        count: experiencesOnProfile.length,
+      })
 
       logger?.info('Reorder experiences:: PENDING')
       const shiftedExperiences = experiencesOnProfile.map((e) => {
         e.order += 1
         return e
       })
-      logger?.info('Reorder experiences:: COMPLETE', { shiftedLinks: shiftedExperiences })
-
+      logger?.info('Reorder experiences:: COMPLETE', {
+        shiftedLinks: shiftedExperiences,
+      })
 
       // Фиксирование индексов порядка для всех остальных experience в профиле
       logger?.info('Reorder experiences COMMIT:: PENDING')
@@ -66,12 +75,11 @@ export const CvExperienceService = {
         await tx
           .update(cvExperienceTable)
           .set({
-            order: e.order
+            order: e.order,
           })
           .where(eq(cvExperienceTable.id, e.id))
       }
       logger?.info('Reorder experiences COMMIT:: COMPLETE')
-
 
       logger?.info('Create new experience:: PENDING')
       const [newExperience] = await tx

@@ -1,4 +1,3 @@
-
 export enum Entities {
   links = 'links',
   experiences = 'experiences',

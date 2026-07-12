@@ -10,18 +10,40 @@ const props = defineProps<{
     <div class="flex items-center justify-between">
       <p class="experience-edit-item__key">Company:</p>
 
-      <InputUI v-if="editExperienceFormData['company']?.focused"
-        v-model="editExperienceFormData['company']!.newValue! as string" size="xsmall" class="w-[50%]!"
-        placeholder="Label">
+      <InputUI
+        v-if="editExperienceFormData['company']?.focused"
+        v-model="editExperienceFormData['company']!.newValue! as string"
+        size="xsmall"
+        class="w-[50%]!"
+        placeholder="Label"
+      >
       </InputUI>
-      <p v-else class="experience-edit-item__value" @click="() => setFieldFocus('company', true)">
+      <p
+        v-else
+        class="experience-edit-item__value"
+        @click="() => setFieldFocus('company', true)"
+      >
         {{ editExperienceFormData.company?.oldValue }}
       </p>
 
       <div class="experience-edit-item__actions">
-        <Icon class="action-btn" :icon="mdiUndo" :size="26" @click="() => props.undoChanges('company')" />
-        <span v-if="editExperienceFormData!['company']?.loading" class="base-button__loader" />
-        <Icon v-else class="action-btn" :icon="mdiHandOkay" :size="26" @click="() => confirmUpdateField('company')" />
+        <Icon
+          class="action-btn"
+          :icon="mdiUndo"
+          :size="26"
+          @click="() => props.undoChanges('company')"
+        />
+        <span
+          v-if="editExperienceFormData!['company']?.loading"
+          class="base-button__loader"
+        />
+        <Icon
+          v-else
+          class="action-btn"
+          :icon="mdiHandOkay"
+          :size="26"
+          @click="() => confirmUpdateField('company')"
+        />
       </div>
     </div>
   </div>

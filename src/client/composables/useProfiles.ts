@@ -1,13 +1,14 @@
-import { onBeforeMount, ref } from "vue"
-import type { SelectOption } from "~/client/components/shared/SelectInputUI.vue"
-import { CvProfileApi } from "~/client/api/admin/cv/profile.api"
-import { _ } from "~/shared/const"
+import { onBeforeMount, ref } from 'vue'
+import type { SelectOption } from '~/client/components/shared/SelectInputUI.vue'
+import { CvProfileApi } from '~/client/api/admin/cv/profile.api'
+import { _ } from '~/shared/const'
 
-export function useProfiles(options?: { setFirstAsSelect?: boolean }, beforeMount?: () => void) {
-
+export function useProfiles(
+  options?: { setFirstAsSelect?: boolean },
+  beforeMount?: () => void,
+) {
   const profiles = ref<SelectOption[]>([])
   const selectedProfileId = ref<string>('')
-
 
   async function uploadProfiles(): Promise<SelectOption[]> {
     const profiles = await CvProfileApi.getAll()

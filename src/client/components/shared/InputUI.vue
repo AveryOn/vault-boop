@@ -86,9 +86,16 @@ onBeforeUnmount(() => {
       {{ props.label }}
     </label>
 
-    <input :id="props.id" :type="props.type" :value="innerValue" class="app-input__field"
-      :class="`app-input__field--${props.size}`" :placeholder="props.placeholder" :disabled="props.disabled"
-      @input="handleInput" />
+    <input
+      :id="props.id"
+      :type="props.type"
+      :value="innerValue"
+      class="app-input__field"
+      :class="`app-input__field--${props.size}`"
+      :placeholder="props.placeholder"
+      :disabled="props.disabled"
+      @input="handleInput"
+    />
 
     <p v-if="props.error" class="app-input__error">
       {{ props.error }}

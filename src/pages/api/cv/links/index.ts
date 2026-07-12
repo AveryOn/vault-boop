@@ -30,9 +30,7 @@ export const POST: APIRoute = async ({ request }) => {
 
   const body = await request.json()
   logger.info('Pick up BODY', { body: body.data })
-  const { success, data, error } = createCvLinkDto.safeParse(
-    body.data,
-  )
+  const { success, data, error } = createCvLinkDto.safeParse(body.data)
 
   if (!success) {
     logger.error('Validation Failed', { error })

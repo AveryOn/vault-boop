@@ -1,5 +1,11 @@
 <script setup lang="ts">
-import { mdiChevronDownBoxOutline, mdiChevronUpBoxOutline, mdiHandOkay, mdiPen, mdiUndo } from '@mdi/js'
+import {
+  mdiChevronDownBoxOutline,
+  mdiChevronUpBoxOutline,
+  mdiHandOkay,
+  mdiPen,
+  mdiUndo,
+} from '@mdi/js'
 import Icon from '~/client/components/common/Icon.vue'
 import SelectInputUI from '~/client/components/shared/SelectInputUI.vue'
 import { _ } from '~/shared/const'
@@ -43,23 +49,52 @@ onBeforeMount(async () => await uploadLinks({ resetSelection: true }))
 <template>
   <section class="cv-admin__links">
     <div class="flex flex-col gap-[24px] min-w-[360px] w-[800px]">
-      <SelectInputUI v-model="selectedProfileId" :options="profiles" :placeholder="'Select Profile'"
-        @input="() => uploadLinks({ resetSelection: true })" />
+      <SelectInputUI
+        v-model="selectedProfileId"
+        :options="profiles"
+        :placeholder="'Select Profile'"
+        @input="() => uploadLinks({ resetSelection: true })"
+      />
 
       <!-- SEPARATOR -->
       <div class="w-full h-[4px] bg-[--primary-color-5]"></div>
 
-      <div class="relative flex items-start justify-center h-[100%] gap-[24px]">
-        <div v-if="selectedLink && linksByProfileId.length > 1"
-          class="absolute left-[-36px] top-0 bottom-0 flex flex-col justify-between">
-          <Icon class="move-link-btn" :size="28" :icon="mdiChevronUpBoxOutline" @click="() => moveLink('up')"></Icon>
-          <Icon class="move-link-btn" :size="28" :icon="mdiChevronDownBoxOutline" @click="moveLink('down')">
+      <div
+        class="relative flex items-start justify-center h-[100%] gap-[24px]"
+      >
+        <div
+          v-if="selectedLink && linksByProfileId.length > 1"
+          class="absolute left-[-36px] top-0 bottom-0 flex flex-col justify-between"
+        >
+          <Icon
+            class="move-link-btn"
+            :size="28"
+            :icon="mdiChevronUpBoxOutline"
+            @click="() => moveLink('up')"
+          ></Icon>
+          <Icon
+            class="move-link-btn"
+            :size="28"
+            :icon="mdiChevronDownBoxOutline"
+            @click="moveLink('down')"
+          >
           </Icon>
         </div>
 
-        <TransitionGroup tag="ul" name="links-list" class="flex flex-col gap-[10px] w-[50%]">
-          <li v-for="link in linksByProfileId" :key="link.id" class="link-item"
-            :class="{ 'bg-[--primary-color-3-100]': link.id === selectedLink?.id }" @click="() => selectLink(link)">
+        <TransitionGroup
+          tag="ul"
+          name="links-list"
+          class="flex flex-col gap-[10px] w-[50%]"
+        >
+          <li
+            v-for="link in linksByProfileId"
+            :key="link.id"
+            class="link-item"
+            :class="{
+              'bg-[--primary-color-3-100]': link.id === selectedLink?.id,
+            }"
+            @click="() => selectLink(link)"
+          >
             <span>{{ link.label }}</span>
 
             <div class="link-item__actions">
@@ -76,25 +111,47 @@ onBeforeMount(async () => await uploadLinks({ resetSelection: true }))
         <Transition name="link-editor">
           <div v-if="selectedLink" class="w-[50%] link-edit-overlay">
             <form class="link-edit-form" @submit.prevent>
-
               <!-- LABEL FIELD -->
               <div class="link-edit-item">
                 <div class="flex items-center justify-between">
                   <p class="link-edit-item__key">Label:</p>
 
-                  <InputUI v-if="editLinkFormData['label']?.focused"
-                    v-model="editLinkFormData['label']!.newValue! as string" size="xsmall" class="w-[50%]!"
-                    placeholder="Label">
+                  <InputUI
+                    v-if="editLinkFormData['label']?.focused"
+                    v-model="
+                      editLinkFormData['label']!.newValue! as string
+                    "
+                    size="xsmall"
+                    class="w-[50%]!"
+                    placeholder="Label"
+                  >
                   </InputUI>
-                  <p v-else class="link-edit-item__value" @click="() => setFieldFocus('label', true)">
+                  <p
+                    v-else
+                    class="link-edit-item__value"
+                    @click="() => setFieldFocus('label', true)"
+                  >
                     {{ editLinkFormData.label?.oldValue }}
                   </p>
 
                   <div class="link-edit-item__actions">
-                    <Icon class="action-btn" :icon="mdiUndo" :size="26" @click="() => undoChanges('label')" />
-                    <span v-if="editLinkFormData!['label']?.loading" class="base-button__loader" />
-                    <Icon v-else class="action-btn" :icon="mdiHandOkay" :size="26"
-                      @click="() => confirmUpdateField('label')" />
+                    <Icon
+                      class="action-btn"
+                      :icon="mdiUndo"
+                      :size="26"
+                      @click="() => undoChanges('label')"
+                    />
+                    <span
+                      v-if="editLinkFormData!['label']?.loading"
+                      class="base-button__loader"
+                    />
+                    <Icon
+                      v-else
+                      class="action-btn"
+                      :icon="mdiHandOkay"
+                      :size="26"
+                      @click="() => confirmUpdateField('label')"
+                    />
                   </div>
                 </div>
               </div>
@@ -104,19 +161,48 @@ onBeforeMount(async () => await uploadLinks({ resetSelection: true }))
                 <div class="flex items-center justify-between">
                   <p class="link-edit-item__key">Profile:</p>
 
-                  <SelectInputUI v-if="editLinkFormData['profileId']?.focused"
-                    v-model="editLinkFormData['profileId']!.newValue! as string" class="w-[50%]!" :options="profiles"
-                    size="xsmall">
+                  <SelectInputUI
+                    v-if="editLinkFormData['profileId']?.focused"
+                    v-model="
+                      editLinkFormData['profileId']!.newValue! as string
+                    "
+                    class="w-[50%]!"
+                    :options="profiles"
+                    size="xsmall"
+                  >
                   </SelectInputUI>
-                  <p v-else class="link-edit-item__value" @click="() => setFieldFocus('profileId', true)">
-                    {{profiles.find(v => v.value === editLinkFormData.profileId?.oldValue)?.label}}
+                  <p
+                    v-else
+                    class="link-edit-item__value"
+                    @click="() => setFieldFocus('profileId', true)"
+                  >
+                    {{
+                      profiles.find(
+                        (v) =>
+                          v.value ===
+                          editLinkFormData.profileId?.oldValue,
+                      )?.label
+                    }}
                   </p>
 
                   <div class="link-edit-item__actions">
-                    <Icon class="action-btn" :icon="mdiUndo" :size="26" @click="() => undoChanges('profileId')" />
-                    <span v-if="editLinkFormData!['profileId']?.loading" class="base-button__loader" />
-                    <Icon v-else class="action-btn" :icon="mdiHandOkay" :size="26"
-                      @click="() => confirmUpdateField('profileId')" />
+                    <Icon
+                      class="action-btn"
+                      :icon="mdiUndo"
+                      :size="26"
+                      @click="() => undoChanges('profileId')"
+                    />
+                    <span
+                      v-if="editLinkFormData!['profileId']?.loading"
+                      class="base-button__loader"
+                    />
+                    <Icon
+                      v-else
+                      class="action-btn"
+                      :icon="mdiHandOkay"
+                      :size="26"
+                      @click="() => confirmUpdateField('profileId')"
+                    />
                   </div>
                 </div>
               </div>
@@ -126,19 +212,44 @@ onBeforeMount(async () => await uploadLinks({ resetSelection: true }))
                 <div class="flex items-center justify-between">
                   <p class="link-edit-item__key">Type:</p>
 
-                  <SelectInputUI v-if="editLinkFormData['type']?.focused"
-                    v-model="editLinkFormData['type']!.newValue! as string" class="w-[50%]!"
-                    :options="SocialNetworks.map(v => ({ label: v, value: v }))" size="xsmall">
+                  <SelectInputUI
+                    v-if="editLinkFormData['type']?.focused"
+                    v-model="
+                      editLinkFormData['type']!.newValue! as string
+                    "
+                    class="w-[50%]!"
+                    :options="
+                      SocialNetworks.map((v) => ({ label: v, value: v }))
+                    "
+                    size="xsmall"
+                  >
                   </SelectInputUI>
-                  <p v-else class="link-edit-item__value" @click="() => setFieldFocus('type', true)">
+                  <p
+                    v-else
+                    class="link-edit-item__value"
+                    @click="() => setFieldFocus('type', true)"
+                  >
                     {{ editLinkFormData.type?.oldValue }}
                   </p>
 
                   <div class="link-edit-item__actions">
-                    <Icon class="action-btn" :icon="mdiUndo" :size="26" @click="() => undoChanges('type')" />
-                    <span v-if="editLinkFormData!['type']?.loading" class="base-button__loader" />
-                    <Icon v-else class="action-btn" :icon="mdiHandOkay" :size="26"
-                      @click="() => confirmUpdateField('type')" />
+                    <Icon
+                      class="action-btn"
+                      :icon="mdiUndo"
+                      :size="26"
+                      @click="() => undoChanges('type')"
+                    />
+                    <span
+                      v-if="editLinkFormData!['type']?.loading"
+                      class="base-button__loader"
+                    />
+                    <Icon
+                      v-else
+                      class="action-btn"
+                      :icon="mdiHandOkay"
+                      :size="26"
+                      @click="() => confirmUpdateField('type')"
+                    />
                   </div>
                 </div>
               </div>
@@ -148,19 +259,42 @@ onBeforeMount(async () => await uploadLinks({ resetSelection: true }))
                 <div class="flex items-center justify-between">
                   <p class="link-edit-item__key">URL:</p>
 
-                  <InputUI v-if="editLinkFormData['url']?.focused"
-                    v-model="editLinkFormData['url']!.newValue! as string" size="xsmall" class="w-[50%]!"
-                    placeholder="URL">
+                  <InputUI
+                    v-if="editLinkFormData['url']?.focused"
+                    v-model="
+                      editLinkFormData['url']!.newValue! as string
+                    "
+                    size="xsmall"
+                    class="w-[50%]!"
+                    placeholder="URL"
+                  >
                   </InputUI>
-                  <p v-else class="link-edit-item__value" @click="() => setFieldFocus('url', true)">
+                  <p
+                    v-else
+                    class="link-edit-item__value"
+                    @click="() => setFieldFocus('url', true)"
+                  >
                     {{ editLinkFormData.url?.oldValue }}
                   </p>
 
                   <div class="link-edit-item__actions">
-                    <Icon class="action-btn" :icon="mdiUndo" :size="26" @click="() => undoChanges('url')" />
-                    <span v-if="editLinkFormData!['url']?.loading" class="base-button__loader" />
-                    <Icon v-else class="action-btn" :icon="mdiHandOkay" :size="26"
-                      @click="() => confirmUpdateField('url')" />
+                    <Icon
+                      class="action-btn"
+                      :icon="mdiUndo"
+                      :size="26"
+                      @click="() => undoChanges('url')"
+                    />
+                    <span
+                      v-if="editLinkFormData!['url']?.loading"
+                      class="base-button__loader"
+                    />
+                    <Icon
+                      v-else
+                      class="action-btn"
+                      :icon="mdiHandOkay"
+                      :size="26"
+                      @click="() => confirmUpdateField('url')"
+                    />
                   </div>
                 </div>
               </div>
@@ -170,28 +304,58 @@ onBeforeMount(async () => await uploadLinks({ resetSelection: true }))
                 <div class="flex items-center justify-between">
                   <p class="link-edit-item__key">Visible:</p>
 
-                  <CheckboxUI v-model="editLinkFormData['isVisible']!.newValue! as boolean" />
+                  <CheckboxUI
+                    v-model="
+                      editLinkFormData['isVisible']!.newValue! as boolean
+                    "
+                  />
 
                   <div class="link-edit-item__actions">
-                    <Icon class="action-btn" :icon="mdiUndo" :size="26" @click="() => undoChanges('isVisible')" />
-                    <span v-if="editLinkFormData!['isVisible']?.loading" class="base-button__loader" />
-                    <Icon v-else class="action-btn" :icon="mdiHandOkay" :size="26"
-                      @click="() => confirmUpdateField('isVisible')" />
+                    <Icon
+                      class="action-btn"
+                      :icon="mdiUndo"
+                      :size="26"
+                      @click="() => undoChanges('isVisible')"
+                    />
+                    <span
+                      v-if="editLinkFormData!['isVisible']?.loading"
+                      class="base-button__loader"
+                    />
+                    <Icon
+                      v-else
+                      class="action-btn"
+                      :icon="mdiHandOkay"
+                      :size="26"
+                      @click="() => confirmUpdateField('isVisible')"
+                    />
                   </div>
                 </div>
               </div>
             </form>
           </div>
         </Transition>
-
       </div>
 
-      <TransitionGroup tag="div" name="link-actions" class="w-full flex justify-center gap-[14px]">
-        <ButtonBaseUI v-if="linksAreReordered" key="save-order" :loading="isSaveReorderLoading" @click="saveNewOrder">
+      <TransitionGroup
+        tag="div"
+        name="link-actions"
+        class="w-full flex justify-center gap-[14px]"
+      >
+        <ButtonBaseUI
+          v-if="linksAreReordered"
+          key="save-order"
+          :loading="isSaveReorderLoading"
+          @click="saveNewOrder"
+        >
           Save New Order
         </ButtonBaseUI>
 
-        <ButtonBaseUI v-if="linksAreReordered" key="reset-order" :variant="'secondary'" @click="resetChangesOrder">
+        <ButtonBaseUI
+          v-if="linksAreReordered"
+          key="reset-order"
+          :variant="'secondary'"
+          @click="resetChangesOrder"
+        >
           Reset Order
         </ButtonBaseUI>
 
@@ -199,11 +363,20 @@ onBeforeMount(async () => await uploadLinks({ resetSelection: true }))
           * Create New *
         </ButtonBaseUI>
 
-        <ButtonBaseUI v-if="someChange" key="commit-changes" @click="submitFormChanges">
+        <ButtonBaseUI
+          v-if="someChange"
+          key="commit-changes"
+          @click="submitFormChanges"
+        >
           Commit Changes
         </ButtonBaseUI>
 
-        <ButtonBaseUI v-if="someChange" key="reset-changes" :variant="'secondary'" @click="resetFormChanges">
+        <ButtonBaseUI
+          v-if="someChange"
+          key="reset-changes"
+          :variant="'secondary'"
+          @click="resetFormChanges"
+        >
           Reset Changes
         </ButtonBaseUI>
       </TransitionGroup>

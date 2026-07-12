@@ -97,13 +97,20 @@ onBeforeUnmount(() => {
       {{ props.label }}
     </label>
 
-    <button :id="props.id" type="button" class="app-select__field" :class="[
-      `app-select__field--${props.size}`,
-      {
-        'app-select__field--open': isOpen,
-        'app-select__field--empty': !selectedOption,
-      },
-    ]" :disabled="props.disabled" @click="toggleDropdown">
+    <button
+      :id="props.id"
+      type="button"
+      class="app-select__field"
+      :class="[
+        `app-select__field--${props.size}`,
+        {
+          'app-select__field--open': isOpen,
+          'app-select__field--empty': !selectedOption,
+        },
+      ]"
+      :disabled="props.disabled"
+      @click="toggleDropdown"
+    >
       <span class="app-select__value">
         {{ selectedOption?.label ?? props.placeholder }}
       </span>
@@ -112,10 +119,18 @@ onBeforeUnmount(() => {
     </button>
 
     <div v-if="isOpen" class="app-select__dropdown">
-      <button v-for="option in props.options" :key="option.value" type="button" class="app-select__option" :class="{
-        'app-select__option--selected': option.value === model,
-        'app-select__option--disabled': option.disabled,
-      }" :disabled="option.disabled" @click="selectOption(option)">
+      <button
+        v-for="option in props.options"
+        :key="option.value"
+        type="button"
+        class="app-select__option"
+        :class="{
+          'app-select__option--selected': option.value === model,
+          'app-select__option--disabled': option.disabled,
+        }"
+        :disabled="option.disabled"
+        @click="selectOption(option)"
+      >
         {{ option.label }}
       </button>
     </div>
@@ -209,9 +224,7 @@ onBeforeUnmount(() => {
 }
 
 .app-select__field--empty {
-  color: color-mix(in srgb,
-      var(--primary-color-1) 55%,
-      transparent);
+  color: color-mix(in srgb, var(--primary-color-1) 55%, transparent);
 }
 
 .app-select__field:disabled {

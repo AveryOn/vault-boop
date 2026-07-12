@@ -40,9 +40,11 @@ export function parseDurationToMs(duration: SleepDuration): number {
   return value * UNIT_TO_MS[unit]
 }
 
-export async function sleep(duration: SleepDuration | number): Promise<void> {
-
-  let remainingMs = typeof duration === 'number' ? duration : parseDurationToMs(duration)
+export async function sleep(
+  duration: SleepDuration | number,
+): Promise<void> {
+  let remainingMs =
+    typeof duration === 'number' ? duration : parseDurationToMs(duration)
 
   while (remainingMs > 0) {
     const currentMs = Math.min(remainingMs, MAX_TIMEOUT_MS)

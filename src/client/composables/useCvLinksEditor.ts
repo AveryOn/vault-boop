@@ -20,7 +20,7 @@ export function useCvLinksEditor() {
       'order',
     ],
 
-    getLabel: link => link.label,
+    getLabel: (link) => link.label,
 
     createPageUrl: AppRoutes.admin.CvLinksNew,
 
@@ -30,10 +30,7 @@ export function useCvLinksEditor() {
       },
 
       patch(id, body) {
-        return CvLinksApi.patch(
-          id,
-          body as PatchCvLinkDto,
-        )
+        return CvLinksApi.patch(id, body as PatchCvLinkDto)
       },
 
       reorder(profileId, items) {
@@ -47,8 +44,7 @@ export function useCvLinksEditor() {
     messages: {
       updated: 'Ссылка изменена',
       updateError: 'Произошла ошибка при изменении ссылки',
-      reorderError:
-        'Произошла ошибка при изменении порядка ссылок',
+      reorderError: 'Произошла ошибка при изменении порядка ссылок',
     },
   })
 }

@@ -1,9 +1,9 @@
-import type { APIRoute } from "astro"
-import { ZodBundleErrors } from "~/server/plugins/zod.plugin"
-import { CvLinkService } from "~/server/services/admin/cv/link.service"
-import { _ } from "~/shared/const"
-import { reorderLinksDto } from "~/shared/dto/cv/link.dto"
-import { Logger } from "~/shared/logger/logger.client"
+import type { APIRoute } from 'astro'
+import { ZodBundleErrors } from '~/server/plugins/zod.plugin'
+import { CvLinkService } from '~/server/services/admin/cv/link.service'
+import { _ } from '~/shared/const'
+import { reorderLinksDto } from '~/shared/dto/cv/link.dto'
+import { Logger } from '~/shared/logger/logger.client'
 
 export const PUT: APIRoute = async ({ request }) => {
   const logger = new Logger('HTTP:PUT:REORDER_LINKS')
@@ -21,10 +21,13 @@ export const PUT: APIRoute = async ({ request }) => {
       )
     }
 
-    const isSuccess = await CvLinkService.reorder({
-      linksOrder: data.linksOrder,
-      profileId: data.profileId,
-    }, logger)
+    const isSuccess = await CvLinkService.reorder(
+      {
+        linksOrder: data.linksOrder,
+        profileId: data.profileId,
+      },
+      logger,
+    )
 
     return Response.json({ data: isSuccess })
   } catch (err) {

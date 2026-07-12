@@ -27,8 +27,8 @@ export type EntityEditForm<
   TEntity,
   TEditableKey extends keyof TEntity,
 > = {
-    [K in TEditableKey]: EntityFieldState<TEntity[K]>
-  }
+  [K in TEditableKey]: EntityFieldState<TEntity[K]>
+}
 
 export type EntityPatchBody<
   TEntity,
@@ -46,10 +46,7 @@ export interface CvEntityEditorApi<
     body: EntityPatchBody<TEntity, TEditableKey>,
   ): Promise<TEntity | boolean | null>
 
-  reorder(
-    profileId: string,
-    items: EntityOrderItem[],
-  ): Promise<boolean>
+  reorder(profileId: string, items: EntityOrderItem[]): Promise<boolean>
 }
 
 export interface UseCvEntityEditorOptions<
@@ -89,17 +86,15 @@ export interface UseCvEntityEditorOptions<
 export function useCvEntityEditor<
   TEntity extends CvEditableEntity,
   TEditableKey extends keyof TEntity,
->(
-  options: UseCvEntityEditorOptions<TEntity, TEditableKey>,
-) {
+>(options: UseCvEntityEditorOptions<TEntity, TEditableKey>) {
   const toast = useToast()
 
-  const {
-    profiles,
-    selectedProfileId,
-  } = useProfiles({ setFirstAsSelect: true }, () => {
-    loadEntities({ resetSelection: true })
-  })
+  const { profiles, selectedProfileId } = useProfiles(
+    { setFirstAsSelect: true },
+    () => {
+      loadEntities({ resetSelection: true })
+    },
+  )
 
   const entities = ref<TEntity[]>([])
   const selectedEntity = ref<TEntity | null>(null)
@@ -120,7 +115,7 @@ export function useCvEntityEditor<
     }
 
     return entities.value.filter(
-      entity => entity.profileId === selectedProfileId.value,
+      (entity) => entity.profileId === selectedProfileId.value,
     )
   })
 
@@ -131,7 +126,7 @@ export function useCvEntityEditor<
 
     return entityOrder.value.some((item) => {
       const sourceEntity = entities.value.find(
-        entity => entity.id === item.id,
+        (entity) => entity.id === item.id,
       )
 
       return sourceEntity?.order !== item.order
@@ -219,9 +214,7 @@ export function useCvEntityEditor<
     }
   }
 
-  function refreshSource(
-    body: EntityPatchBody<TEntity, TEditableKey>,
-  ) {
+  function refreshSource(body: EntityPatchBody<TEntity, TEditableKey>) {
     const selectedId = selectedEntity.value?.id
 
     if (!selectedId) {
@@ -268,19 +261,16 @@ export function useCvEntityEditor<
       state.oldValue = state.newValue
       state.focused = false
 
-      toast.success(
-        options.messages?.updated ?? 'Данные изменены',
-        {
-          duration: 3000,
-          title: 'Success!',
-        },
-      )
+      toast.success(options.messages?.updated ?? 'Данные изменены', {
+        duration: 3000,
+        title: 'Success!',
+      })
     } catch (error) {
       console.error(error)
 
       toast.error(
         options.messages?.updateError ??
-        'Произошла ошибка при обновлении поля',
+          'Произошла ошибка при обновлении поля',
         {
           duration: 3000,
           title: 'Ошибка',
@@ -291,10 +281,7 @@ export function useCvEntityEditor<
     }
   }
 
-  function collectChanges(): EntityPatchBody<
-    TEntity,
-    TEditableKey
-  > {
+  function collectChanges(): EntityPatchBody<TEntity, TEditableKey> {
     const body: EntityPatchBody<TEntity, TEditableKey> = {}
 
     for (const field of options.editableFields) {
@@ -331,19 +318,16 @@ export function useCvEntityEditor<
         ...body,
       })
 
-      toast.success(
-        options.messages?.updated ?? 'Данные изменены',
-        {
-          duration: 3000,
-          title: 'Success!',
-        },
-      )
+      toast.success(options.messages?.updated ?? 'Данные изменены', {
+        duration: 3000,
+        title: 'Success!',
+      })
     } catch (error) {
       console.error(error)
 
       toast.error(
         options.messages?.updateError ??
-        'Произошла ошибка при изменении данных',
+          'Произошла ошибка при изменении данных',
         {
           duration: 3000,
           title: 'Ошибка',
@@ -370,7 +354,7 @@ export function useCvEntityEditor<
     }
 
     const currentIndex = entities.value.findIndex(
-      entity => entity.id === selectedId,
+      (entity) => entity.id === selectedId,
     )
 
     if (currentIndex === -1) {
@@ -378,23 +362,18 @@ export function useCvEntityEditor<
     }
 
     const targetIndex =
-      direction === 'up'
-        ? currentIndex - 1
-        : currentIndex + 1
+      direction === 'up' ? currentIndex - 1 : currentIndex + 1
 
-    if (
-      targetIndex < 0 ||
-      targetIndex >= entities.value.length
-    ) {
+    if (targetIndex < 0 || targetIndex >= entities.value.length) {
       return
     }
 
     const reordered = [...entities.value]
 
-      ;[reordered[currentIndex], reordered[targetIndex]] = [
-        reordered[targetIndex],
-        reordered[currentIndex],
-      ]
+    ;[reordered[currentIndex], reordered[targetIndex]] = [
+      reordered[targetIndex],
+      reordered[currentIndex],
+    ]
 
     entities.value = reordered
     rebuildEntityOrder()
@@ -405,7 +384,7 @@ export function useCvEntityEditor<
       (a, b) => a.order - b.order,
     )
 
-    entityOrder.value = entities.value.map(entity => ({
+    entityOrder.value = entities.value.map((entity) => ({
       id: entity.id,
       order: entity.order,
       label: getEntityLabel(entity as TEntity),
@@ -435,7 +414,7 @@ export function useCvEntityEditor<
 
       toast.error(
         options.messages?.reorderError ??
-        'Произошла ошибка при изменении порядка',
+          'Произошла ошибка при изменении порядка',
         {
           duration: 3000,
           title: 'Ошибка',

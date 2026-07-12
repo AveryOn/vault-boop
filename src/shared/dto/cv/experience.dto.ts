@@ -18,9 +18,9 @@ export const createCvExperienceDto = z.object({
 export type CreateExperienceDto = z.infer<typeof createCvExperienceDto>
 
 export interface CreateExperienceResponse {
-  newExperience: Experience,
+  newExperience: Experience
   shiftedExperiences: {
-    id: string,
-    order: number,
+    id: string
+    order: number
   }[]
 }
