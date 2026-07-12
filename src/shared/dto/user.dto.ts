@@ -6,7 +6,10 @@ export type UserInput = typeof userTable.$inferInsert
 
 export const createUserDto = z.object({
   // profileId: z.uuid(),
-  // company: z.string().trim().min(1),
+  username: z.string().trim().min(3),
+  firstName: z.string().trim().min(3),
+  lastName: z.string().trim().min(3),
+  password: z.string().trim().min(8),
   // position: z.string().trim().min(1),
   // description: z.string().trim().min(1),
   // location: z.string().trim().min(1).nullable(),
