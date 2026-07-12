@@ -4,7 +4,7 @@ export const AuthCheckMiddleware = defineMiddleware(
   async (ctx, next) => {
     // const url = new URL(ctx.request.url)
 
-    // console.log('HELLO', url)
+    console.log('HELLO', 'AUTH MIDDLEWARE')
 
     // const isAdminRoute = url.pathname.startsWith('/admin')
 
