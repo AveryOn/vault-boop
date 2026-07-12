@@ -10,3 +10,5 @@ export const createAccessTokenDto = z.object({
 export type CreateAccessTokenDto = z.infer<typeof createAccessTokenDto>
 export type CreateAccessTokenResponse = Omit<AccessToken, 'token' | 'userId'>
 
+
+export type CreateAccessTokenSecureDto = Pick<AccessTokenInput, 'userId'>
