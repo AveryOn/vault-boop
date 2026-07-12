@@ -85,8 +85,12 @@ export const UserService = {
 
   async delete(userId: string): Promise<boolean> {
     try {
+      const now = dateISO()
       await db
-        .delete(userTable)
+        .update(userTable)
+        .set({
+          deletedAt: now,
+        })
         .where(
           eq(userTable.id, userId),
         )
