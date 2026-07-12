@@ -1,25 +1,12 @@
 import z from 'zod'
-import type { sessionTable } from '~/server/database/schema'
+import type { userActionTable } from '~/server/database/schema'
 
-export type Session = typeof sessionTable.$inferSelect
-export type SessionInput = typeof sessionTable.$inferInsert
+export type UserAction = typeof userActionTable.$inferSelect
+export type UserActionInput = typeof userActionTable.$inferInsert
 
-export const createSessionDto = z.object({
+export const createUserActionDto = z.object({
   userId: z.uuid(),
-  accessTokenId: z.uuid(),
-  lastActionId: z.uuid(),
-  expiresAt: z.string(),
-  lastUsedAt: z.string(),
+  actionId: z.uuid(),
 })
-export type CreateSessionDto = z.infer<typeof createSessionDto>
-export type CreateSessionResponse = Session
-
-export const updateSessionDto = z.object({
-  accessTokenId: z.uuid(),
-  lastActionId: z.uuid(),
-  expiresAt: z.string(),
-  lastUsedAt: z.string(),
-})
-
-export type UpdateSessionDto = z.infer<typeof updateSessionDto>
-export type UpdateSessionResponse = Session
+export type CreateUserActionDto = z.infer<typeof createUserActionDto>
+export type CreateUserActionResponse = UserAction
