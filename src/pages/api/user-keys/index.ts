@@ -3,7 +3,7 @@ import {
   Logger,
   type LoggerDetails,
 } from '~/shared/logger/logger.client'
-import { _ } from '~/shared/const'
+import { _, CookieName } from '~/shared/const'
 import { HttpStatusCode } from 'axios'
 import { throwZodError } from '~/server/plugins/zod.plugin'
 import { UserActionService, UserKeyService } from '~/server/services'
@@ -31,7 +31,12 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 
 
   logger.info('Excludes an accessToken from cookies')
-  const accessToken = cookies.get('accessToken')?.value
+  const accessToken = cookies.get(CookieName['accessToken'])?.value
+
+  if (!accessToken) {
+    logger.warn('Access Token is not found.', { status: HttpStatusCode.Unauthorized })
+    return new Response(null, { status: HttpStatusCode.Unauthorized })
+  }
 
 
   const body = await request.json()
