@@ -10,13 +10,6 @@ export const createUserDto = z.object({
   firstName: z.string().trim().min(3),
   lastName: z.string().trim().min(3),
   password: z.string().trim().min(8),
-  // position: z.string().trim().min(1),
-  // description: z.string().trim().min(1),
-  // location: z.string().trim().min(1).nullable(),
-  // employmentTypeId: z.uuid(),
-  // startDate: z.string().min(1),
-  // endDate: z.string().trim().min(1).nullable(),
-  // isCurrent: z.boolean().default(false),
 })
 export type CreateUserDto = z.infer<typeof createUserDto>
 
