@@ -10,6 +10,9 @@ export const userKeyTable = sqliteTable('user_key', {
     .notNull()
     .references(() => userTable.id, { onDelete: 'cascade' }),
 
+  name: text('name').notNull(),
+  keyHash: text('key_hash').notNull(),
+
   createdAt: timestamp('created_at', true).notNull(),
   updatedAt: timestamp('updated_at', true).notNull(),
   deletedAt: timestamp('deleted_at'),
