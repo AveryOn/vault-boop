@@ -1,13 +1,17 @@
 import { sqliteTable, text } from 'drizzle-orm/sqlite-core'
 import { id, timestamp } from '~/server/database/helpers'
-import { vaultUserTable } from '~/server/database/schema/vault-user.table'
+import { userTable } from '~/server/database/schema/user.table'
 
-export const vaultSessionTable = sqliteTable('vault_session', {
+export const sessionTable = sqliteTable('session', {
   id: id(),
 
-  vaultUserId: text('vault_user_id')
+  userId: text('user_id')
     .notNull()
-    .references(() => vaultUserTable.id, { onDelete: 'cascade' }),
+    .references(() => userTable.id, { onDelete: 'cascade' }),
+
+  accessTokenId: text('access_token_id')
+    .notNull()
+    .references(() => userTable.id, { onDelete: 'cascade' }),
 
   status: text('status').default('ACTIVE'),
   expiresAt: timestamp('expires_at').notNull(),

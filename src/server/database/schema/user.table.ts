@@ -1,7 +1,7 @@
 import { sqliteTable, text } from 'drizzle-orm/sqlite-core'
 import { id, timestamp } from '~/server/database/helpers'
 
-export const vaultUserTable = sqliteTable('vault_user', {
+export const userTable = sqliteTable('user', {
   id: id(),
 
   firstName: text('first_name').notNull(),
