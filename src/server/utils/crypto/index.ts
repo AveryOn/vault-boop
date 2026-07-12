@@ -74,8 +74,8 @@ const algorithm = algorithmMap[env.HASH_ALGORITHM as keyof typeof algorithmMap]
 export async function hashPassword(password: string): Promise<string> {
   return argon2.hash(password, {
     type: algorithm,
-    memoryCost: 131072,
-    timeCost: 4,
-    parallelism: 1,
+    memoryCost: env.HASH_ALGORITHM_MEM_COST,
+    timeCost: env.HASH_ALGORITHM_TIME_COST,
+    parallelism: env.HASH_ALGORITHM_PARALLELISM,
   })
 }
