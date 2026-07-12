@@ -34,6 +34,23 @@ export const UserService = {
     return user
   },
 
+  async getByUsername(username: string): Promise<UserSafety | null> {
+    const [user] = await db
+      .select({
+        firstName: userTable.firstName,
+        lastName: userTable.lastName,
+        createdAt: userTable.createdAt,
+        updatedAt: userTable.updatedAt,
+        deletedAt: userTable.deletedAt,
+      })
+      .from(userTable)
+      .where(
+        eq(userTable.username, username)
+      )
+    return user ?? null
+  },
+
+
   async create(data: CreateUserDto): Promise<CreateUserResponse> {
     const now = dateISO()
     const [user] = await db
