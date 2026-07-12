@@ -33,7 +33,7 @@ export const useAppStore = defineStore('APP_STORE', () => {
       return
     }
 
-    applyTheme(AppTheme['app-theme-package-1'])
+    applyTheme(AppTheme['app-theme-package-2'])
   }
 
   function getCurrentPath() {
