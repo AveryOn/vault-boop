@@ -1,4 +1,4 @@
-import type { SignUpDto } from "~/shared/dto/auth.dto"
+import type { SignInDto, SignUpDto } from "~/shared/dto/auth.dto"
 import type { Logger } from "~/shared/logger/logger.client"
 import { db } from "~/server/database/client"
 import { hashPassword } from "../utils/crypto"
@@ -7,8 +7,8 @@ import { ActionService, SessionService, UserActionService } from "../services"
 import { ActionKey } from "~/shared/dto/action.dto"
 import { ProcessStatus } from "~/shared/const";
 
-export const SignupUseCase = {
-  async createUserKey(dto: SignUpDto, logger: Logger) {
+export const AuthUseCase = {
+  async signUp(dto: SignUpDto, logger: Logger) {
     return await db.transaction(async (tx) => {
       logger.info('Find User By Username:: ' + ProcessStatus.PENDING)
       const existsUser = await UserService.getByUsername(dto.username, tx)
@@ -55,5 +55,8 @@ export const SignupUseCase = {
       }, tx)
       logger.info('Create new Session:: ' + ProcessStatus.COMPLETE, { session })
     })
+  },
+
+  async signIn(dto: SignInDto, logger: Logger) {
   }
 }

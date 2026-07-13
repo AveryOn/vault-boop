@@ -6,7 +6,7 @@ import { _ } from '~/shared/const'
 import { HttpStatusCode } from 'axios'
 import { throwZodError } from '~/server/plugins/zod.plugin'
 import { signUpDto } from '~/shared/dto/auth.dto'
-import { SignupUseCase } from '~/server/use-cases/signup.user-case'
+import { AuthUseCase } from '~/server/use-cases/auth.use-case'
 
 export const POST: APIRoute = async ({ request }) => {
   const logger = new Logger('HTTP:POST:Auth.Sign-Up')
@@ -23,7 +23,7 @@ export const POST: APIRoute = async ({ request }) => {
   logger.debug('TEST', { data })
 
   if (!data) throw new Error('DATA IS NOT DEFINED')
-  await SignupUseCase.createUserKey({
+  await AuthUseCase.signUp({
     firstName: data?.firstName,
     lastName: data?.lastName,
     password: data?.password,

@@ -1,41 +1,36 @@
 import type { APIRoute } from 'astro'
 import {
   Logger,
-  type LoggerDetails,
 } from '~/shared/logger/logger.client'
-import { _, CookieName } from '~/shared/const'
+import { _ } from '~/shared/const'
 import { HttpStatusCode } from 'axios'
 import { throwZodError } from '~/server/plugins/zod.plugin'
-import { UserActionService, UserKeyService } from '~/server/services'
-import { createUserKeyDto } from '~/shared/dto/user-key.dto'
-import { db } from '~/server/database/client'
+import { signInDto, signUpDto } from '~/shared/dto/auth.dto'
+import { AuthUseCase } from '~/server/use-cases/auth.use-case'
 
-export const POST: APIRoute = async ({ request, cookies }) => {
+export const POST: APIRoute = async ({ request }) => {
   const logger = new Logger('HTTP:POST:Auth.Sign-In')
 
   const body = await request.json()
-  logger.info('Pick up BODY', { body: body.data })
+  logger.info('Pick up BODY', { body: body })
 
-  const { success, data, error } = createUserKeyDto.safeParse(body.data)
+  const { success, data, error } = signInDto.safeParse(body)
 
   if (!success) {
     logger.error('Validation Failed', { error })
     throwZodError(error, logger, 'Validation Error')
   }
+  logger.debug('TEST', { data })
 
-  const result = db.transaction(async (tx) => {
-
-    UserActionService.create({
-      userId:
-    })
-    const newRecord = await UserKeyService.create({
-      userActionId
-    }, logger)
-  })
+  if (!data) throw new Error('DATA IS NOT DEFINED')
+  await AuthUseCase.signIn({
+    password: data?.password,
+    username: data?.username,
+  }, logger)
 
 
   return Response.json(
-    { data: newRecord },
+    { data: {} },
     { status: HttpStatusCode.Created },
   )
 }
