@@ -1,17 +1,14 @@
 import type { APIRoute } from 'astro'
 import {
   Logger,
-  type LoggerDetails,
 } from '~/shared/logger/logger.client'
-import { _, CookieName } from '~/shared/const'
+import { _ } from '~/shared/const'
 import { HttpStatusCode } from 'axios'
 import { throwZodError } from '~/server/plugins/zod.plugin'
-import { UserActionService, UserKeyService } from '~/server/services'
-import { createUserKeyDto } from '~/shared/dto/user-key.dto'
-import { db } from '~/server/database/client'
 import { signUpDto } from '~/shared/dto/auth.dto'
+import { SignupUseCase } from '~/server/use-cases/signup.user-case'
 
-export const POST: APIRoute = async ({ request, cookies }) => {
+export const POST: APIRoute = async ({ request }) => {
   const logger = new Logger('HTTP:POST:Auth.Sign-Up')
 
   const body = await request.json()
@@ -25,18 +22,13 @@ export const POST: APIRoute = async ({ request, cookies }) => {
   }
   logger.debug('TEST', { data })
 
-  User
-
-  // const result = db.transaction(async (tx) => {
-
-  //   UserActionService.create({
-  //     userId:
-  //   })
-  //   const newRecord = await UserKeyService.create({
-  //     userActionId
-  //   }, logger)
-  // })
-
+  if (!data) throw new Error('DATA IS NOT DEFINED')
+  await SignupUseCase.createUserKey({
+    firstName: data?.firstName,
+    lastName: data?.lastName,
+    password: data?.password,
+    username: data?.username,
+  }, logger)
 
   return Response.json(
     { data: {} },
