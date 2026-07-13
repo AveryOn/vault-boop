@@ -104,11 +104,13 @@ export const AuthCheckMiddleware = defineMiddleware(
     logger.info('[STAGE_3]:: Fetch all sessions by UserId', { userId: tokenPayload.userId })
     const sessions = await SessionService.getByUserId(tokenPayload.userId)
 
-    // Получение и проверка текущей сессии привязанной к токену доступа
-    logger.info('[STAGE_3]:: Exclude Current session from sessions', { sessionId: tokenPayload.sessionId })
 
-    logger.info('[STAGE_3]:: Find the session by sessionId and userId')
+    // Получение и проверка текущей сессии привязанной к токену доступа
+    // Извлечение текущей сессии
+    logger.info('[STAGE_3]:: Exclude Current session from sessions', { sessionId: tokenPayload.sessionId })
     const currentSession = sessions.find(s => s.id === tokenPayload.sessionId && s.userId === tokenPayload.userId) ?? null
+    logger.info('[STAGE_3]:: Find the session by sessionId and userId')
+
     // Если по такому ID сессии не существует то это нарушение
     if (!currentSession) {
       logger.error('[STAGE_3]:: Violation: session with such sessionId and userId is not found')
@@ -116,7 +118,6 @@ export const AuthCheckMiddleware = defineMiddleware(
       logger.info('[STAGE_3]:: Redirect to: ' + AppRoutes.client.SignIn)
       return RedirectToSignIn(ctx, next)
     }
-
 
     //  Группировка сессий по статусу
     logger.info('[STAGE_4]:: Grouping By session statuses')
@@ -177,6 +178,7 @@ export const AuthCheckMiddleware = defineMiddleware(
         logger.info('[STAGE_6]:: Redirect to: ' + AppRoutes.client.SignIn)
         return RedirectToSignIn(ctx, next)
       }
+      // Сессия просрочена
       else {
         logger.error('[STAGE_6]:: PENDING session is expired', { sessionId: session?.id })
 
@@ -200,6 +202,7 @@ export const AuthCheckMiddleware = defineMiddleware(
         // Сессия ещё не просрочена
         logger.info('[STAGE_6]:: ACTIVE session is exists', { sessionId: session.id })
       }
+      // Сессия просрочена
       else {
         logger.error('[STAGE_6]:: ACTIVE session is expired', { sessionId: session?.id })
 
