@@ -46,11 +46,13 @@ export const UserActionService = {
         actionId: dto.actionId,
         userId: secureData.userId,
         createdAt: now,
+        comment: dto.comment,
       })
       .returning({
         id: userActionTable.id,
         createdAt: userActionTable.createdAt,
         actionId: userActionTable.actionId,
+        comment: userActionTable.comment,
       })
 
     return newUserAction
