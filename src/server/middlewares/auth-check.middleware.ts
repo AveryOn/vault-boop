@@ -21,7 +21,7 @@ function RedirectToSignIn(ctx: MiddlewareCtx): Response {
 }
 
 /** Дешифрование токена доступа. Извлечение payload токена */
-async function decryptAccessToken(accessToken: string, logger): Promise<AccessTokenPayload | null> {
+async function decryptAccessToken(accessToken: string, logger: Logger): Promise<AccessTokenPayload | null> {
   try {
     return JSON.parse(await decryptData(accessToken, 'access')) as AccessTokenPayload
   } catch (err) {
@@ -46,11 +46,19 @@ export const AuthCheckMiddleware = defineMiddleware(
     // Проверка токена доступа:
     const tokenPayload: AccessTokenPayload | null = await decryptAccessToken(accessToken, logger)
     if (!tokenPayload) {
+      logger.warn('Failed to exclude the token payload data')
       return RedirectToSignIn(ctx)
     }
 
     // Проверка сессий пользователя
     const sessions = await SessionService.getByUserId(tokenPayload.userId)
+
+    // Получение и проверка текущей сессии привязанной к токену доступа
+    const currentSession = sessions.find(s => s.id === tokenPayload.sessionId) ?? null
+    // Если по такому ID сессии не существует то это нарушение
+    if (!currentSession) {
+      return RedirectToSignIn(ctx)
+    }
 
     //  Группировка сессий по статусу
     const sessionsMap = sessions.reduce<
