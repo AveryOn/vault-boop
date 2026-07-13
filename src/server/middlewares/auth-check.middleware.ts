@@ -119,6 +119,15 @@ export const AuthCheckMiddleware = defineMiddleware(
       return RedirectToSignIn(ctx, next)
     }
 
+    // Если ID токена доступа из payload не сходится с ID токена доступа в Сессии
+    logger.info('[STAGE_3]:: Matching check tokenPayload.tokenId === currentSession.accessTokenId')
+    if (currentSession.accessTokenId !== tokenPayload.tokenId) {
+      logger.error('[STAGE_3]:: Matching Error: tokenPayload.tokenId !== currentSession.accessTokenId')
+
+      logger.info('[STAGE_3]:: Redirect to: ' + AppRoutes.client.SignIn)
+      return RedirectToSignIn(ctx, next)
+    }
+
     //  Группировка сессий по статусу
     logger.info('[STAGE_4]:: Grouping By session statuses')
 
