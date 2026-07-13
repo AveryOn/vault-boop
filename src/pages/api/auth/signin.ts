@@ -5,7 +5,7 @@ import {
 import { _ } from '~/shared/const'
 import { HttpStatusCode } from 'axios'
 import { throwZodError } from '~/server/plugins/zod.plugin'
-import { signInDto, signUpDto } from '~/shared/dto/auth.dto'
+import { signInDto } from '~/shared/dto/auth.dto'
 import { AuthUseCase } from '~/server/use-cases/auth.use-case'
 
 export const POST: APIRoute = async ({ request }) => {
