@@ -5,7 +5,7 @@ import { AccessTokenService, SessionService, UserService } from '~/server/servic
 import { clientRoutes } from '~/shared/router/client.routes'
 import { decryptData } from '../utils/crypto'
 import type { AccessTokenPayload } from '~/shared/dto/access-token.dto'
-import type { APIContext } from 'astro'
+import type { APIContext, MiddlewareNext } from 'astro'
 import type { Session } from '~/shared/dto/session.dto'
 import { SessionUseCase } from '../use-cases/session.use-case'
 import { AppRoutes } from '~/shared/router'
@@ -17,8 +17,12 @@ type MiddlewareCtx = APIContext<Record<string, any>, Record<string, string | und
  * Переход на страницу входа
  * @param ctx - контекст выполнения middleware
  */
-function RedirectToSignIn(ctx: MiddlewareCtx): Response {
-  return ctx.redirect(clientRoutes.SignIn)
+async function RedirectToSignIn(ctx: MiddlewareCtx, next: MiddlewareNext): Promise<Response> {
+  const url = new URL(ctx.request.url)
+  if (url.pathname !== clientRoutes.SignIn) {
+    return ctx.redirect(clientRoutes.SignIn)
+  }
+  return next()
 }
 
 /** Дешифрование токена доступа. Извлечение payload токена */
@@ -33,7 +37,6 @@ async function decryptAccessToken(accessToken: string, logger: Logger): Promise<
 
 export const AuthCheckMiddleware = defineMiddleware(
   async (ctx, next) => {
-    // const url = new URL(ctx.request.url)
 
     const logger = new Logger('MIDDLEWARE:AuthCheck:RUN')
 
@@ -43,7 +46,7 @@ export const AuthCheckMiddleware = defineMiddleware(
 
     if (!accessToken) {
       logger.warn('[STAGE_1]:: Access Token is not found!')
-      return RedirectToSignIn(ctx)
+      return RedirectToSignIn(ctx, next)
     }
     else {
       logger.info('[STAGE_1]:: AccessToken is excluded from cookies', { accessToken })
@@ -55,7 +58,7 @@ export const AuthCheckMiddleware = defineMiddleware(
     const tokenPayload: AccessTokenPayload | null = await decryptAccessToken(accessToken, logger)
     if (!tokenPayload) {
       logger.warn('[STAGE_2]:: Failed to exclude the token payload data')
-      return RedirectToSignIn(ctx)
+      return RedirectToSignIn(ctx, next)
     }
     // Если payload токена получилось извлечь без ошибок
     else {
@@ -66,7 +69,7 @@ export const AuthCheckMiddleware = defineMiddleware(
       if (!tokenFromDb) {
         logger.error('[STAGE_2]:: Token with such ID is not found in DB')
         logger.info('[STAGE_2]:: Redirect to: ' + AppRoutes.client.SignIn)
-        return RedirectToSignIn(ctx)
+        return RedirectToSignIn(ctx, next)
       }
       if (!tokenFromDb?.archivedAt && tokenFromDb.token !== accessToken) {
         logger.error('[STAGE_2]:: The token from the cookie NOT matches the token from the Database')
@@ -94,7 +97,7 @@ export const AuthCheckMiddleware = defineMiddleware(
     if (!userFromDb) {
       logger.error('[STAGE_3]:: User with such ID is not found in Database')
       logger.info('[STAGE_3]:: Redirect to: ' + AppRoutes.client.SignIn)
-      return RedirectToSignIn(ctx)
+      return RedirectToSignIn(ctx, next)
     }
 
     // Проверка сессий пользователя
@@ -111,7 +114,7 @@ export const AuthCheckMiddleware = defineMiddleware(
       logger.error('[STAGE_3]:: Violation: session with such sessionId and userId is not found')
 
       logger.info('[STAGE_3]:: Redirect to: ' + AppRoutes.client.SignIn)
-      return RedirectToSignIn(ctx)
+      return RedirectToSignIn(ctx, next)
     }
 
     //  Группировка сессий по статусу
@@ -152,7 +155,7 @@ export const AuthCheckMiddleware = defineMiddleware(
         await SessionService.terminate(s.id)
       }
       logger.info('[STAGE_5]:: Redirect to: ' + AppRoutes.client.SignIn)
-      return RedirectToSignIn(ctx)
+      return RedirectToSignIn(ctx, next)
     }
 
     logger.error('[STAGE_6]:: Handle PENDING session if it\'s exists')
@@ -169,13 +172,13 @@ export const AuthCheckMiddleware = defineMiddleware(
         // Сессия ещё не просрочена
         logger.info('[STAGE_6]:: PENDING session is exists', { sessionId: session.id })
         logger.info('[STAGE_6]:: Redirect to: ' + AppRoutes.client.SignIn)
-        return RedirectToSignIn(ctx)
+        return RedirectToSignIn(ctx, next)
       }
       else {
         logger.error('[STAGE_6]:: PENDING session is expired', { sessionId: session?.id })
 
         logger.info('[STAGE_6]:: Redirect to: ' + AppRoutes.client.SignIn)
-        return RedirectToSignIn(ctx)
+        return RedirectToSignIn(ctx, next)
       }
     }
 
