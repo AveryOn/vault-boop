@@ -1,7 +1,7 @@
-import type { CreateSessionDto, Session, TerminateAllSessionsDto } from "~/shared/dto/session.dto";
+import type { CreateSessionDto, GetSessionByStatus, Session, TerminateAllSessionsDto } from "~/shared/dto/session.dto";
 import { db as database, type DatabaseTransaction } from "~/server/database/client";
 import { sessionTable } from "../database/schema";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { SessionStatus } from "~/shared/const";
 import { dateISO, getExpiresAt } from "~/shared/utils/datetime";
 import { serverEnv as env } from "~/server/config/env";
@@ -47,16 +47,29 @@ export const SessionService = {
     return session ?? null
   },
 
-  async getByUserId(userId: string, tx?: DatabaseTransaction): Promise<Session | null> {
+  async getByUserId(userId: string, tx?: DatabaseTransaction): Promise<Session[]> {
     const db = SelectDatabaseAdapter(database, tx)
-    const [session] = await db
+    const session = await db
       .select()
       .from(sessionTable)
       .where(
         eq(sessionTable.userId, userId),
       )
+    return session
+  },
 
-    return session ?? null
+  async getByStatus(dto: GetSessionByStatus, tx?: DatabaseTransaction): Promise<Session[]> {
+    const db = SelectDatabaseAdapter(database, tx)
+    const sessions = await db
+      .select()
+      .from(sessionTable)
+      .where(
+        and(
+          eq(sessionTable.userId, dto.userId),
+          eq(sessionTable.status, dto.status),
+        )
+      )
+    return sessions
   },
 
   async getByAccessTokenId(accessTokenId: string, tx?: DatabaseTransaction): Promise<Session | null> {

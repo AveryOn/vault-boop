@@ -1,5 +1,6 @@
 import z from 'zod'
 import type { sessionTable } from '~/server/database/schema'
+import { SessionStatus } from '~/shared/const'
 
 export type Session = typeof sessionTable.$inferSelect
 export type SessionInput = typeof sessionTable.$inferInsert
@@ -26,3 +27,10 @@ export const terminateAllSessionsDto = z.object({
   userId: z.uuid(),
 })
 export type TerminateAllSessionsDto = z.infer<typeof terminateAllSessionsDto>
+
+
+export const getSessionByStatus = z.object({
+  userId: z.uuid(),
+  status: z.enum(SessionStatus),
+})
+export type GetSessionByStatus = z.infer<typeof getSessionByStatus>
