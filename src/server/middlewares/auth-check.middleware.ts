@@ -1,14 +1,21 @@
 import { defineMiddleware } from 'astro:middleware'
-import { ProcessStatus, SessionStatus } from '~/shared/const'
+import { CookieName, ProcessStatus, SessionStatus } from '~/shared/const'
 import { Logger } from '~/shared/logger/logger.client'
 import { AccessTokenService, SessionService, UserService } from '~/server/services'
 import { clientRoutes } from '~/shared/router/client.routes'
-import { decryptData } from '../utils/crypto'
+import { decryptData } from '~/server/utils/crypto'
 import type { AccessTokenPayload } from '~/shared/dto/access-token.dto'
 import type { APIContext } from 'astro'
 import type { Session } from '~/shared/dto/session.dto'
-import { SessionUseCase } from '../use-cases/session.use-case'
+import { SessionUseCase } from '~/server/use-cases/session.use-case'
 import { AppRoutes } from '~/shared/router'
+
+const PUBLIC_ROUTES = [
+  clientRoutes.SignIn,
+  clientRoutes.SignUp,
+  '/api/auth/signin',
+  '/api/auth/signup',
+].map(normalizePath)
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type MiddlewareCtx = APIContext<Record<string, any>, Record<string, string | undefined>>
@@ -30,7 +37,7 @@ async function decryptAccessToken(accessToken: string, logger: Logger): Promise<
 function rejectUnauthorized(ctx: MiddlewareCtx): Response {
   const pathname = normalizePath(new URL(ctx.request.url).pathname)
 
-  ctx.cookies.delete('accessToken', {
+  ctx.cookies.delete(CookieName.accessToken, {
     path: '/',
   })
 
@@ -46,6 +53,12 @@ function rejectUnauthorized(ctx: MiddlewareCtx): Response {
     )
   }
 
+  if (pathname === normalizePath(clientRoutes.SignIn)) {
+    return new Response(null, {
+      status: 401,
+    })
+  }
+
   return ctx.redirect(clientRoutes.SignIn)
 }
 
@@ -55,6 +68,10 @@ export const AuthCheckMiddleware = defineMiddleware(
     const url = new URL(ctx.request.url)
     const pathname = normalizePath(url.pathname)
 
+    if (PUBLIC_ROUTES.includes(pathname)) {
+      return next()
+    }
+
     // Если открывается страница SignUp то минуем все проверки
     if (pathname === normalizePath(clientRoutes.SignUp)) {
       logger.info('Redirect to: ' + AppRoutes.client.SignUp)
@@ -62,8 +79,7 @@ export const AuthCheckMiddleware = defineMiddleware(
     }
 
     logger.info('[STAGE_1]:: Exclude the accessToken from cookies')
-    // const accessToken = ctx.cookies.get(CookieName['accessToken'])?.value
-    const accessToken = 'asdasd'
+    const accessToken = ctx.cookies.get(CookieName['accessToken'])?.value
 
     if (!accessToken) {
       logger.warn('[STAGE_1]:: Access Token is not found!')
