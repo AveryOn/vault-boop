@@ -14,6 +14,7 @@ export const UserActionService = {
         id: userActionTable.id,
         createdAt: userActionTable.createdAt,
         actionId: userActionTable.actionId,
+        comment: userActionTable.comment,
       })
       .from(userActionTable)
   },
@@ -25,6 +26,7 @@ export const UserActionService = {
         id: userActionTable.id,
         createdAt: userActionTable.createdAt,
         actionId: userActionTable.actionId,
+        comment: userActionTable.comment,
       })
       .from(userActionTable)
       .where(
