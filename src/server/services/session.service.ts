@@ -84,7 +84,7 @@ export const SessionService = {
   },
 
   /** Принудительное завершение всех сессий для пользователя */
-  async terminateAllSession(dto: TerminateAllSessionsDto, tx?: DatabaseTransaction): Promise<boolean> {
+  async terminateAll(dto: TerminateAllSessionsDto, tx?: DatabaseTransaction): Promise<boolean> {
     try {
       const db = SelectDatabaseAdapter(database, tx)
       await db
@@ -103,7 +103,7 @@ export const SessionService = {
     }
   },
 
-  async terminateSession(sessionId: string, tx?: DatabaseTransaction): Promise<boolean> {
+  async terminate(sessionId: string, tx?: DatabaseTransaction): Promise<boolean> {
     try {
       const db = SelectDatabaseAdapter(database, tx)
       await db

@@ -1,8 +1,34 @@
 import { defineMiddleware } from 'astro:middleware'
-import { CookieName } from '~/shared/const'
+import { CookieName, ProcessStatus, SessionStatus } from '~/shared/const'
 import { Logger } from '~/shared/logger/logger.client'
-import { AccessTokenService } from '~/server/services'
+import { AccessTokenService, SessionService } from '~/server/services'
 import { clientRoutes } from '~/shared/router/client.routes'
+import { decryptData } from '../utils/crypto'
+import type { AccessTokenPayload } from '~/shared/dto/access-token.dto'
+import type { APIContext } from 'astro'
+import type { Session } from '~/shared/dto/session.dto'
+import { SessionUseCase } from '../use-cases/session.use-case'
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type MiddlewareCtx = APIContext<Record<string, any>, Record<string, string | undefined>>
+
+/**
+ * Переход на страницу входа
+ * @param ctx - контекст выполнения middleware
+ */
+function RedirectToSignIn(ctx: MiddlewareCtx): Response {
+  return ctx.redirect(clientRoutes.SignIn)
+}
+
+/** Дешифрование токена доступа. Извлечение payload токена */
+async function decryptAccessToken(accessToken: string, logger): Promise<AccessTokenPayload | null> {
+  try {
+    return JSON.parse(await decryptData(accessToken, 'access')) as AccessTokenPayload
+  } catch (err) {
+    logger.error('AccessToken decryption Error:: ' + ProcessStatus.ERROR, { err })
+    return null
+  }
+}
 
 export const AuthCheckMiddleware = defineMiddleware(
   async (ctx, next) => {
@@ -14,9 +40,54 @@ export const AuthCheckMiddleware = defineMiddleware(
 
     if (!accessToken) {
       logger.warn('Access Token is not found!')
-      return ctx.redirect(clientRoutes.SignIn)
+      return RedirectToSignIn(ctx)
     }
 
+    // Проверка токена доступа:
+    const tokenPayload: AccessTokenPayload | null = await decryptAccessToken(accessToken, logger)
+    if (!tokenPayload) {
+      return RedirectToSignIn(ctx)
+    }
+
+    // Проверка сессий пользователя
+    const sessions = await SessionService.getByUserId(tokenPayload.userId)
+
+    //  Группировка сессий по статусу
+    const sessionsMap = sessions.reduce<
+      Record<keyof typeof SessionStatus, Session[]>
+    >((acc, session) => {
+      acc[session.status as SessionStatus] ??= []
+      acc[session.status as SessionStatus].push(session)
+
+      return acc
+    }, {} as Record<keyof typeof SessionStatus, Session[]>)
+
+    /*
+     Если у пользователя неожиданное состояние сессий (когда есть и ACTIVE и PENDING сессии)
+     то делаем деактивацию всех сессий пользователя
+     */
+    if (
+      sessionsMap.ACTIVE.length > 0
+      && sessionsMap.PENDING.length > 0
+    ) {
+      for (const s of sessions) {
+        await SessionService.terminate(s.id)
+      }
+      return RedirectToSignIn(ctx)
+    }
+
+    if (sessionsMap.PENDING?.length > 0) {
+      const session = await SessionUseCase.handlerPendingSession(
+        tokenPayload.userId,
+        logger,
+      )
+      if (
+        session?.expiresAt &&
+        new Date(session.expiresAt).getTime() > Date.now()
+      ) {
+        // Сессия ещё не просрочена
+      }
+    }
 
     // AccessTokenService.create
     // console.log('HELLO', 'AUTH MIDDLEWARE')

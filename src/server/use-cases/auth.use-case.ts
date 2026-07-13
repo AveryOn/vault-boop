@@ -5,8 +5,9 @@ import { hashPassword } from "~/server/utils/crypto"
 import { UserService } from '~/server/services/user.service';
 import { ActionService, SessionService, UserActionService } from "~/server/services"
 import { ActionKey } from "~/shared/dto/action.dto"
-import { ProcessStatus, SessionStatus } from "~/shared/const";
+import { ProcessStatus } from "~/shared/const";
 import { HttpStatusCode } from "axios";
+import { SessionUseCase } from "~/server/use-cases/session.use-case";
 
 export const AuthUseCase = {
   async signUp(dto: SignUpDto, logger: Logger) {
@@ -71,6 +72,7 @@ export const AuthUseCase = {
       logger.info('Find User By Username:: ' + ProcessStatus.COMPLETE)
 
 
+      SessionUseCase
       // FIND SESSION
       // logger.info('Find user session:: ' + ProcessStatus.PENDING)
       // const  = await SessionService.getByStatus({

@@ -41,7 +41,7 @@ export const SessionUseCase = {
           })
           const mostFreshlySession = sessions.pop()!
           for (const s of sessions) {
-            const success = await SessionService.terminateSession(s.id, tx)
+            const success = await SessionService.terminate(s.id, tx)
             if (!success) {
               logger.error(`session with id=${s.id} processing ended with an error`)
               throw new Error(`session with id=${s.id} processing ended with an error`)
@@ -95,7 +95,7 @@ export const SessionUseCase = {
           })
           const mostFreshlySession = sessions.pop()!
           for (const s of sessions) {
-            const success = await SessionService.terminateSession(s.id, tx)
+            const success = await SessionService.terminate(s.id, tx)
             if (!success) {
               logger.error(`session with id=${s.id} processing ended with an error`)
               throw new Error(`session with id=${s.id} processing ended with an error`)
