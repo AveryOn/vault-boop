@@ -13,5 +13,6 @@ export const userActionTable = sqliteTable('user_action', {
     .notNull()
     .references(() => userTable.id, { onDelete: 'cascade' }),
 
+  comment: text('comment'),
   createdAt: timestamp('created_at', true).notNull(),
 })
