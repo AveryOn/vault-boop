@@ -70,6 +70,7 @@ const formData = ref({
 })
 
 const isLoading = ref(false)
+const isRegistered = ref(false)
 
 function clearErrors(): void {
   formData.value.username.error = ''
@@ -81,6 +82,10 @@ function clearErrors(): void {
 
 function undoError(field: keyof typeof formData.value): void {
   formData.value[field].error = ''
+}
+
+function goToSignIn(): void {
+  window.location.href = '/example/auth/signin'
 }
 
 async function submit(): Promise<void> {
@@ -110,15 +115,17 @@ async function submit(): Promise<void> {
     }
 
     const {
+      repeatPassword: _repeatPassword,
       ...payload
     } = result.data
 
     await AuthApi.signUp(payload)
 
-    toast.success('Success!')
-  } catch (err) {
-    console.error(err)
-    throw err
+    isRegistered.value = true
+    toast.success('Account created successfully')
+  } catch (error) {
+    console.error(error)
+    toast.error('Failed to create account')
   } finally {
     isLoading.value = false
   }
@@ -128,27 +135,45 @@ async function submit(): Promise<void> {
 <template>
   <section class="mx-auto w-[360px] h-full flex items-center justify-center py-10">
     <article class="overlay-card">
-      <form class="w-[360px] min-h-[720px] flex flex-col px-[24px] py-[12px] gap-[28px]" @submit.prevent="submit">
-        <h1 class="text-[36px] ml-auto">
-          Sign Up
-        </h1>
+      <Transition name="content-switch" mode="out-in">
+        <form v-if="!isRegistered" key="signup-form"
+          class="w-[360px] min-h-[720px] flex flex-col px-[24px] py-[12px] gap-[28px]" @submit.prevent="submit">
+          <h1 class="text-[36px] ml-auto">
+            Sign Up
+          </h1>
 
-        <InputUI v-model="formData.username.value" placeholder="Username" :size="'large'" type="text" label="Username"
-          :error="formData.username.error" @input="undoError('username')" />
+          <InputUI v-model="formData.username.value" placeholder="Username" size="large" type="text" label="Username"
+            :error="formData.username.error" @input="undoError('username')" />
 
-        <InputUI v-model="formData.password.value" type="password" autocomplete="new-password" placeholder="Password"
-          :size="'large'" label="Password" :error="formData.password.error" @input="undoError('password')" />
+          <InputUI v-model="formData.password.value" type="password" autocomplete="new-password" placeholder="Password"
+            size="large" label="Password" :error="formData.password.error" @input="undoError('password')" />
 
-        <InputUI v-model="formData.repeatPassword.value" type="password" autocomplete="new-password"
-          placeholder="Repeat password" :size="'large'" label="Repeat password" :error="formData.repeatPassword.error"
-          @input="undoError('repeatPassword')" />
+          <InputUI v-model="formData.repeatPassword.value" type="password" autocomplete="new-password"
+            placeholder="Repeat password" size="large" label="Repeat password" :error="formData.repeatPassword.error"
+            @input="undoError('repeatPassword')" />
 
-        <div class="w-full flex justify-center mt-auto mb-[24px]">
-          <ButtonUI type="submit" class="w-[50%]" :disabled="isLoading">
-            {{ isLoading ? 'Loading...' : 'Submit' }}
+          <div class="w-full flex justify-center mt-auto mb-[24px]">
+            <ButtonUI type="submit" class="w-[50%]" :disabled="isLoading">
+              {{ isLoading ? 'Loading...' : 'Submit' }}
+            </ButtonUI>
+          </div>
+        </form>
+
+        <div v-else key="success-message"
+          class="w-[360px] min-h-[420px] flex flex-col items-center justify-center gap-[32px] px-[32px] py-[40px]">
+          <h1 class="text-[36px]">
+            Success
+          </h1>
+
+          <p class="text-center text-[18px] leading-[1.6]">
+            Вы успешно зарегистрировали аккаунт, далее выполните вход в систему.
+          </p>
+
+          <ButtonUI type="button" class="w-[70%]" @click="goToSignIn">
+            Sign In
           </ButtonUI>
         </div>
-      </form>
+      </Transition>
     </article>
   </section>
 </template>
@@ -165,5 +190,22 @@ async function submit(): Promise<void> {
   height: max-content;
   background-color: var(--primary-color-2);
   color: var(--cv-text-color-1);
+}
+
+.content-switch-enter-active,
+.content-switch-leave-active {
+  transition:
+    opacity 250ms ease,
+    transform 250ms ease;
+}
+
+.content-switch-enter-from {
+  opacity: 0;
+  transform: translateY(16px);
+}
+
+.content-switch-leave-to {
+  opacity: 0;
+  transform: translateY(-16px);
 }
 </style>
