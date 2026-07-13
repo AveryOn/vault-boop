@@ -19,10 +19,21 @@ type MiddlewareCtx = APIContext<Record<string, any>, Record<string, string | und
  */
 async function RedirectToSignIn(ctx: MiddlewareCtx, next: MiddlewareNext): Promise<Response> {
   const url = new URL(ctx.request.url)
-  if (url.pathname !== clientRoutes.SignIn) {
+  const pathname = normalizePath(url.pathname)
+  const SignUpPath = normalizePath(clientRoutes.SignUp)
+  const SignInPath = normalizePath(clientRoutes.SignIn)
+
+  if (pathname === SignUpPath) {
+    return ctx.redirect(clientRoutes.SignUp)
+  }
+  if (pathname !== SignInPath) {
     return ctx.redirect(clientRoutes.SignIn)
   }
   return next()
+}
+
+function normalizePath(path: string): string {
+  return path !== '/' ? path.replace(/\/+$/, '') : path
 }
 
 /** Дешифрование токена доступа. Извлечение payload токена */
@@ -37,6 +48,13 @@ async function decryptAccessToken(accessToken: string, logger: Logger): Promise<
 
 export const AuthCheckMiddleware = defineMiddleware(
   async (ctx, next) => {
+    const url = new URL(ctx.request.url)
+    const SignUpPath = normalizePath(clientRoutes.SignUp)
+    const pathname = normalizePath(url.pathname)
+
+    if (pathname === SignUpPath) {
+      return next()
+    }
 
     const logger = new Logger('MIDDLEWARE:AuthCheck:RUN')
 
