@@ -6,7 +6,7 @@ import { _ } from '~/shared/const'
 import { HttpStatusCode } from 'axios'
 import { throwZodError } from '~/server/plugins/zod.plugin'
 import { signUpDto } from '~/shared/dto/auth.dto'
-// import { SignupUseCase } from '~/server/use-cases/signup.user-case'
+import { SignupUseCase } from '~/server/use-cases/signup.user-case'
 
 export const POST: APIRoute = async ({ request }) => {
   const logger = new Logger('HTTP:POST:Auth.Sign-Up')
