@@ -52,12 +52,17 @@ export const AuthCheckMiddleware = defineMiddleware(
     const url = new URL(ctx.request.url)
     const pathname = normalizePath(url.pathname)
 
+    // Всё что начинается на '/api
+    if (pathname.startsWith('/api')) {
+      console.debug("ASFASJBNASIUFASIFUIASFNIASUFBISF", pathname)
+      next()
+    }
+
     // Если открывается страница SignUp то минуем все проверки
     if (pathname === normalizePath(clientRoutes.SignUp)) {
       logger.info('Redirect to: ' + AppRoutes.client.SignUp)
       return next()
     }
-
 
     logger.info('[STAGE_1]:: Exclude the accessToken from cookies')
     // const accessToken = ctx.cookies.get(CookieName['accessToken'])?.value
