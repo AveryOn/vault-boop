@@ -42,7 +42,7 @@ export const SignupUseCase = {
       logger.info('Create new User Action:: ' + ProcessStatus.PENDING)
       const newUserAction = await UserActionService.create(
         { userId: newUser.id },
-        { actionId: action.id },
+        { actionId: action.id, comment: 'ActionKey.SessionCreated' },
         tx,
       )
       logger.info('Create new User Action:: ' + ProcessStatus.COMPLETE)
