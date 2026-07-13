@@ -23,16 +23,24 @@ export const POST: APIRoute = async ({ request }) => {
   logger.debug('TEST', { data })
 
   if (!data) throw new Error('DATA IS NOT DEFINED')
-  await AuthUseCase.signUp({
-    firstName: data?.firstName,
-    lastName: data?.lastName,
-    password: data?.password,
-    username: data?.username,
-  }, logger)
 
+  try {
+    await AuthUseCase.signUp({
+      firstName: data?.firstName,
+      lastName: data?.lastName,
+      password: data?.password,
+      username: data?.username,
+    }, logger)
+    return Response.json(
+      { data: { success: true } },
+      { status: HttpStatusCode.Ok },
+    )
+  } catch (error) {
+    logger.error('Sign-up failed', { error })
 
-  return Response.json(
-    { data: {} },
-    { status: HttpStatusCode.Created },
-  )
+    return Response.json(
+      { data: { success: false } },
+      { status: HttpStatusCode.Ok },
+    )
+  }
 }

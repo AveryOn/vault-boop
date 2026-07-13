@@ -55,7 +55,7 @@ export const AuthCheckMiddleware = defineMiddleware(
     // Всё что начинается на '/api
     if (pathname.startsWith('/api')) {
       console.debug("ASFASJBNASIUFASIFUIASFNIASUFBISF", pathname)
-      next()
+      return next()
     }
 
     // Если открывается страница SignUp то минуем все проверки

@@ -120,8 +120,10 @@ async function submit(): Promise<void> {
       ...payload
     } = result.data
 
-    await AuthApi.signUp(payload)
-
+    const { data } = await AuthApi.signUp(payload)
+    if (!data?.success) {
+      throw ''
+    }
     isRegistered.value = true
     toast.success('Account created successfully')
   } catch (error) {

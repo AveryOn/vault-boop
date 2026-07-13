@@ -1,7 +1,6 @@
 import type { SignInDto, SignUpDto } from "~/shared/dto/auth.dto";
 import { httpClient } from "~/client/api/http-client";
 import { AppRoutes } from "~/shared/router";
-
 const routes = AppRoutes.api.client
 
 export const AuthApi = {
@@ -11,7 +10,6 @@ export const AuthApi = {
   },
 
   async signUp(dto: SignUpDto) {
-    const result = await httpClient.post<{ data: { success: boolean } }>(routes.SignUp, dto)
-    return result.data
+    return await httpClient.post<{ data: { success: boolean } }>(routes.SignUp, dto)
   }
 }
