@@ -72,11 +72,25 @@ export const AuthCheckMiddleware = defineMiddleware(
       else {
         logger.info('[STAGE_2]:: The token from the cookie matches the token from the Database')
       }
+
+      logger.info('[STAGE_2]:: Compare UserId from the AccessToken with the UserId from the AccessTokenPayload')
+      if (tokenFromDb.userId !== tokenPayload.userId) {
+        logger.info('[STAGE_2]:: UserIds are not matches!', {
+          cookiesTokenUserId: tokenPayload.userId,
+          dbTokenUserId: tokenFromDb.userId,
+        })
+      }
     }
 
     // Проверка пользователя
     logger.info('[STAGE_3]:: Checks userId', { userId: tokenPayload.userId })
-    UserService.getById(tokenPayload.userId)
+    const userFromDb = await UserService.getById(tokenPayload.userId)
+    // Если пользователя с таким ID нет
+    if (!userFromDb) {
+      logger.error('[STAGE_3]:: User with such ID is not found in Database')
+      logger.info('[STAGE_3]:: Redirect to: ' + AppRoutes.client.SignIn)
+      return RedirectToSignIn(ctx)
+    }
 
     // Проверка сессий пользователя
     logger.info('[STAGE_3]:: Fetch all sessions by UserId', { userId: tokenPayload.userId })
