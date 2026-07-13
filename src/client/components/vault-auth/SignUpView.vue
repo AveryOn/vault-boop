@@ -48,12 +48,12 @@ const formData = ref({
     focused: '',
   },
   firstName: {
-    value: '',
+    value: '_user_',
     error: '',
     focused: '',
   },
   lastName: {
-    value: '',
+    value: '_vault_',
     error: '',
     focused: '',
   },
@@ -135,12 +135,6 @@ async function submit(): Promise<void> {
 
         <InputUI v-model="formData.username.value" placeholder="Username" :size="'large'" type="text" label="Username"
           :error="formData.username.error" @input="undoError('username')" />
-
-        <InputUI v-model="formData.firstName.value" placeholder="First name" :size="'large'" type="text"
-          label="First name" :error="formData.firstName.error" @input="undoError('firstName')" />
-
-        <InputUI v-model="formData.lastName.value" placeholder="Last name" :size="'large'" type="text" label="Last name"
-          :error="formData.lastName.error" @input="undoError('lastName')" />
 
         <InputUI v-model="formData.password.value" type="password" autocomplete="new-password" placeholder="Password"
           :size="'large'" label="Password" :error="formData.password.error" @input="undoError('password')" />
