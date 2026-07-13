@@ -33,7 +33,7 @@ async function decryptAccessToken(accessToken: string, logger: Logger): Promise<
 
 export const AuthCheckMiddleware = defineMiddleware(
   async (ctx, next) => {
-    const url = new URL(ctx.request.url)
+    // const url = new URL(ctx.request.url)
 
     const logger = new Logger('MIDDLEWARE:AuthCheck:RUN')
 
