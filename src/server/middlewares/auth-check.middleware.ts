@@ -1,7 +1,7 @@
 import { defineMiddleware } from 'astro:middleware'
 import { ProcessStatus, SessionStatus } from '~/shared/const'
 import { Logger } from '~/shared/logger/logger.client'
-import { SessionService } from '~/server/services'
+import { AccessTokenService, SessionService, UserService } from '~/server/services'
 import { clientRoutes } from '~/shared/router/client.routes'
 import { decryptData } from '../utils/crypto'
 import type { AccessTokenPayload } from '~/shared/dto/access-token.dto'
@@ -45,6 +45,10 @@ export const AuthCheckMiddleware = defineMiddleware(
       logger.warn('[STAGE_1]:: Access Token is not found!')
       return RedirectToSignIn(ctx)
     }
+    else {
+      logger.info('[STAGE_1]:: AccessToken is excluded from cookies', { accessToken })
+    }
+
 
     // Проверка токена доступа:
     logger.info('[STAGE_2]:: Decryption the AccessToken. Exclude a payload')
@@ -53,8 +57,26 @@ export const AuthCheckMiddleware = defineMiddleware(
       logger.warn('[STAGE_2]:: Failed to exclude the token payload data')
       return RedirectToSignIn(ctx)
     }
-    logger.info('[STAGE_2]:: Decryption Complete', { tokenPayload })
+    else {
+      logger.info('[STAGE_2]:: Decryption Complete', { tokenPayload })
+      logger.info('[STAGE_2]:: Check AccessToken by its ID')
+      const tokenFromDb = await AccessTokenService.getById(tokenPayload.tokenId)
+      if (!tokenFromDb) {
+        logger.error('[STAGE_2]:: Token with such ID is not found in DB')
+        logger.info('[STAGE_2]:: Redirect to: ' + AppRoutes.client.SignIn)
+        return RedirectToSignIn(ctx)
+      }
+      if (!tokenFromDb?.archivedAt && tokenFromDb.token !== accessToken) {
+        logger.error('[STAGE_2]:: The token from the cookie NOT matches the token from the Database')
+      }
+      else {
+        logger.info('[STAGE_2]:: The token from the cookie matches the token from the Database')
+      }
+    }
 
+    // Проверка пользователя
+    logger.info('[STAGE_3]:: Checks userId', { userId: tokenPayload.userId })
+    UserService.getById(tokenPayload.userId)
 
     // Проверка сессий пользователя
     logger.info('[STAGE_3]:: Fetch all sessions by UserId', { userId: tokenPayload.userId })
@@ -63,7 +85,7 @@ export const AuthCheckMiddleware = defineMiddleware(
     // Получение и проверка текущей сессии привязанной к токену доступа
     logger.info('[STAGE_3]:: Exclude Current session from sessions', { sessionId: tokenPayload.sessionId })
 
-    const currentSession = sessions.find(s => s.id === tokenPayload.sessionId) ?? null
+    const currentSession = sessions.find(s => s.id === tokenPayload.sessionId && s.userId === tokenPayload.userId) ?? null
     // Если по такому ID сессии не существует то это нарушение
     if (!currentSession) {
       logger.error('[STAGE_3]:: Violation: session with such ID is not found')
@@ -87,7 +109,6 @@ export const AuthCheckMiddleware = defineMiddleware(
       EXPIRED: `${sessionsMap.EXPIRED.length} pc.`,
       PENDING: `${sessionsMap.PENDING.length} pc.`,
     })
-
 
     /*
      Если у пользователя неожиданное состояние сессий (когда есть и ACTIVE и PENDING сессии)
