@@ -63,7 +63,7 @@ export const AuthCheckMiddleware = defineMiddleware(
     // Если payload токена получилось извлечь без ошибок
     else {
       logger.info('[STAGE_2]:: Decryption Complete', { tokenPayload })
-      logger.info('[STAGE_2]:: Check AccessToken by its ID')
+      logger.info('[STAGE_2]:: Check AccessToken by its ID in Database')
 
       const tokenFromDb = await AccessTokenService.getById(tokenPayload.tokenId)
       if (!tokenFromDb) {
@@ -117,6 +117,7 @@ export const AuthCheckMiddleware = defineMiddleware(
       return RedirectToSignIn(ctx, next)
     }
 
+
     //  Группировка сессий по статусу
     logger.info('[STAGE_4]:: Grouping By session statuses')
 
@@ -155,6 +156,7 @@ export const AuthCheckMiddleware = defineMiddleware(
         await SessionService.terminate(s.id)
       }
       logger.info('[STAGE_5]:: Redirect to: ' + AppRoutes.client.SignIn)
+      // TODO remove cookies
       return RedirectToSignIn(ctx, next)
     }
 
@@ -181,42 +183,6 @@ export const AuthCheckMiddleware = defineMiddleware(
         return RedirectToSignIn(ctx, next)
       }
     }
-
-    // AccessTokenService.create
-    // console.log('HELLO', 'AUTH MIDDLEWARE')
-
-    // const isAdminRoute = url.pathname.startsWith('/admin')
-
-    // const user = await getCurrentUser(ctx.request)
-
-    // if (!user) {
-    //   return ctx.redirect('/')
-    // }
-
-    // if (user.role === 'admin' && !isAdminRoute) {
-    //   return ctx.redirect('/admin')
-    // }
-
-    // if (user.role !== 'admin' && isAdminRoute) {
-    //   return ctx.redirect('/')
-    // }
-
     return next()
   },
 )
-
-// async function getCurrentUser(request: Request) {
-//   const cookie = request.headers.get('cookie')
-
-//   if (!cookie) {
-//     return null
-//   }
-
-//   // условный пример
-//   const isAdmin = cookie.includes('role=admin')
-
-//   return {
-//     id: 'user-1',
-//     role: isAdmin ? 'admin' : 'user',
-//   }
-// }
