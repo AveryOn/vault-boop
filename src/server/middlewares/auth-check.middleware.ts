@@ -5,32 +5,13 @@ import { AccessTokenService, SessionService, UserService } from '~/server/servic
 import { clientRoutes } from '~/shared/router/client.routes'
 import { decryptData } from '../utils/crypto'
 import type { AccessTokenPayload } from '~/shared/dto/access-token.dto'
-import type { APIContext, MiddlewareNext } from 'astro'
+import type { APIContext } from 'astro'
 import type { Session } from '~/shared/dto/session.dto'
 import { SessionUseCase } from '../use-cases/session.use-case'
 import { AppRoutes } from '~/shared/router'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type MiddlewareCtx = APIContext<Record<string, any>, Record<string, string | undefined>>
-
-/**
- * Переход на страницу входа
- * @param ctx - контекст выполнения middleware
- */
-async function RedirectToSignIn(ctx: MiddlewareCtx, next: MiddlewareNext): Promise<Response> {
-  const url = new URL(ctx.request.url)
-  const pathname = normalizePath(url.pathname)
-  const SignUpPath = normalizePath(clientRoutes.SignUp)
-  const SignInPath = normalizePath(clientRoutes.SignIn)
-
-  if (pathname === SignUpPath) {
-    return ctx.redirect(clientRoutes.SignUp)
-  }
-  if (pathname !== SignInPath) {
-    return ctx.redirect(clientRoutes.SignIn)
-  }
-  return next()
-}
 
 function normalizePath(path: string): string {
   return path !== '/' ? path.replace(/\/+$/, '') : path
@@ -46,17 +27,33 @@ async function decryptAccessToken(accessToken: string, logger: Logger): Promise<
   }
 }
 
+function rejectUnauthorized(ctx: MiddlewareCtx): Response {
+  const pathname = normalizePath(new URL(ctx.request.url).pathname)
+
+  ctx.cookies.delete('accessToken', {
+    path: '/',
+  })
+
+  if (pathname.startsWith('/api/')) {
+    return Response.json(
+      {
+        success: false,
+        error: 'Unauthorized',
+      },
+      {
+        status: 401,
+      },
+    )
+  }
+
+  return ctx.redirect(clientRoutes.SignIn)
+}
+
 export const AuthCheckMiddleware = defineMiddleware(
   async (ctx, next) => {
     const logger = new Logger('MIDDLEWARE:AuthCheck')
     const url = new URL(ctx.request.url)
     const pathname = normalizePath(url.pathname)
-
-    // Всё что начинается на '/api
-    if (pathname.startsWith('/api')) {
-      console.debug("ASFASJBNASIUFASIFUIASFNIASUFBISF", pathname)
-      return next()
-    }
 
     // Если открывается страница SignUp то минуем все проверки
     if (pathname === normalizePath(clientRoutes.SignUp)) {
@@ -70,7 +67,7 @@ export const AuthCheckMiddleware = defineMiddleware(
 
     if (!accessToken) {
       logger.warn('[STAGE_1]:: Access Token is not found!')
-      return RedirectToSignIn(ctx, next)
+      return rejectUnauthorized(ctx)
     }
     else {
       logger.info('[STAGE_1]:: AccessToken is excluded from cookies', { accessToken })
@@ -82,7 +79,7 @@ export const AuthCheckMiddleware = defineMiddleware(
     const tokenPayload: AccessTokenPayload | null = await decryptAccessToken(accessToken, logger)
     if (!tokenPayload) {
       logger.warn('[STAGE_2]:: Failed to exclude the token payload data')
-      return RedirectToSignIn(ctx, next)
+      return rejectUnauthorized(ctx)
     }
     // Если payload токена получилось извлечь без ошибок
     else {
@@ -93,7 +90,7 @@ export const AuthCheckMiddleware = defineMiddleware(
       if (!tokenFromDb) {
         logger.error('[STAGE_2]:: Token with such ID is not found in DB')
         logger.info('[STAGE_2]:: Redirect to: ' + AppRoutes.client.SignIn)
-        return RedirectToSignIn(ctx, next)
+        return rejectUnauthorized(ctx)
       }
       if (!tokenFromDb?.archivedAt && tokenFromDb.token !== accessToken) {
         logger.error('[STAGE_2]:: The token from the cookie NOT matches the token from the Database')
@@ -121,7 +118,7 @@ export const AuthCheckMiddleware = defineMiddleware(
     if (!userFromDb) {
       logger.error('[STAGE_3]:: User with such ID is not found in Database')
       logger.info('[STAGE_3]:: Redirect to: ' + AppRoutes.client.SignIn)
-      return RedirectToSignIn(ctx, next)
+      return rejectUnauthorized(ctx)
     }
 
     // Проверка сессий пользователя
@@ -140,7 +137,7 @@ export const AuthCheckMiddleware = defineMiddleware(
       logger.error('[STAGE_3]:: Violation: session with such sessionId and userId is not found')
 
       logger.info('[STAGE_3]:: Redirect to: ' + AppRoutes.client.SignIn)
-      return RedirectToSignIn(ctx, next)
+      return rejectUnauthorized(ctx)
     }
 
     // Если ID токена доступа из payload не сходится с ID токена доступа в Сессии
@@ -149,7 +146,7 @@ export const AuthCheckMiddleware = defineMiddleware(
       logger.error('[STAGE_3]:: Matching Error: tokenPayload.tokenId !== currentSession.accessTokenId')
 
       logger.info('[STAGE_3]:: Redirect to: ' + AppRoutes.client.SignIn)
-      return RedirectToSignIn(ctx, next)
+      return rejectUnauthorized(ctx)
     }
 
     //  Группировка сессий по статусу
@@ -191,7 +188,7 @@ export const AuthCheckMiddleware = defineMiddleware(
       }
       logger.info('[STAGE_5]:: Redirect to: ' + AppRoutes.client.SignIn)
       // TODO remove cookies
-      return RedirectToSignIn(ctx, next)
+      return rejectUnauthorized(ctx)
     }
 
     // Обработка PENDING сессии
@@ -209,14 +206,14 @@ export const AuthCheckMiddleware = defineMiddleware(
         // Сессия ещё не просрочена
         logger.info('[STAGE_6]:: PENDING session is exists', { sessionId: session.id })
         logger.info('[STAGE_6]:: Redirect to: ' + AppRoutes.client.SignIn)
-        return RedirectToSignIn(ctx, next)
+        return rejectUnauthorized(ctx)
       }
       // Сессия просрочена
       else {
         logger.error('[STAGE_6]:: PENDING session is expired', { sessionId: session?.id })
 
         logger.info('[STAGE_6]:: Redirect to: ' + AppRoutes.client.SignIn)
-        return RedirectToSignIn(ctx, next)
+        return rejectUnauthorized(ctx)
       }
     }
 
@@ -240,7 +237,7 @@ export const AuthCheckMiddleware = defineMiddleware(
         logger.error('[STAGE_6]:: ACTIVE session is expired', { sessionId: session?.id })
 
         logger.info('[STAGE_6]:: Redirect to: ' + AppRoutes.client.SignIn)
-        return RedirectToSignIn(ctx, next)
+        return rejectUnauthorized(ctx)
       }
     }
     return next()

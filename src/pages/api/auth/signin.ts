@@ -26,10 +26,12 @@ export const POST: APIRoute = async ({ request }) => {
     logger.error('DATA IS NOT DEFINED')
     throw new Error('DATA IS NOT DEFINED')
   }
-  await AuthUseCase.signIn({
-    password: data?.password,
-    username: data?.username,
-  }, logger)
+
+  console.debug("ASF:ASFASJNKFKJSBSUFAS")
+  // await AuthUseCase.signIn({
+  //   password: data?.password,
+  //   username: data?.username,
+  // }, logger)
 
 
   return Response.json(

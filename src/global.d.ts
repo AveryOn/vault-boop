@@ -28,4 +28,19 @@ declare global {
   }
 }
 
-declare module '@jamescoyle/vue-icon' {}
+declare module '@jamescoyle/vue-icon' { }
+
+
+/// <reference types="astro/client" />
+
+declare namespace App {
+  interface Locals {
+    userId?: string
+    sessionId?: string
+    tokenId?: string
+    username?: string
+    deviceId?: string
+    ua?: string
+    ip?: string
+  }
+}
