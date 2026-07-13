@@ -8,6 +8,13 @@
       "when": 1783891274689,
       "tag": "0000_foamy_the_fallen",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1783927236205,
+      "tag": "0001_nappy_firestar",
+      "breakpoints": true
     }
   ]
 }
