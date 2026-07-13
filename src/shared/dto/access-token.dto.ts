@@ -16,5 +16,6 @@ export type CreateAccessTokenSecureDto = Pick<AccessTokenInput, 'userId'>
 
 export interface AccessTokenPayload {
   userId: string
+  sessionId: string
   username: string
 }
