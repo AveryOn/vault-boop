@@ -4,7 +4,7 @@ import { clientRoutes } from '~/shared/router/client.routes'
 
 export const BaseCheckUpMiddleware = defineMiddleware(
   async (ctx, next) => {
-    const logger = new Logger('MIDDLEWARE:BaseCheckUp:RUN')
+    const logger = new Logger('MIDDLEWARE:BaseCheckUp')
 
     const url = new URL(ctx.request.url)
     const pathname = url.pathname

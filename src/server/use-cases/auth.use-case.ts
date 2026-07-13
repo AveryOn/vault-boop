@@ -58,7 +58,7 @@ export const AuthUseCase = {
         }, tx)
         logger.info('Create new Session:: ' + ProcessStatus.COMPLETE, { session })
       } catch (err) {
-        logger.error('SignUp Error', { err })
+        logger.error('Sign-Up Error', { err })
         throw err
       }
 
@@ -67,27 +67,37 @@ export const AuthUseCase = {
 
   async signIn(dto: SignInDto, logger: Logger) {
     return await db.transaction(async (tx) => {
+      try {
+        // Найти пользователя по username
+        logger.info('Find User By Username:: ' + ProcessStatus.PENDING)
+        const user = await UserService.getByUsername(dto.username, tx)
+        if (!user) {
+          logger.error('User not found', { status: HttpStatusCode.NotFound })
+          throw new Error('Not Found')
+        }
+        logger.info('Find User By Username:: ' + ProcessStatus.COMPLETE)
 
-      // FIND USER BY USERNAME
-      logger.info('Find User By Username:: ' + ProcessStatus.PENDING)
-      const user = await UserService.getByUsername(dto.username, tx)
-      if (!user) {
-        logger.error('User not found', { status: HttpStatusCode.NotFound })
-        throw new Error('Not Found')
+        logger.info('Password Check:: ' + ProcessStatus.PENDING)
+        const hashedPassword = await hashPassword(dto.password)
+        if (user.masterPasswordHash !== hashedPassword) {
+          logger.error('Password Check:: ' + ProcessStatus.ERROR, { msg: 'passwords mismatch' })
+          throw 'Unauthorized'
+        }
+        logger.info('Password Check:: ' + ProcessStatus.COMPLETE)
+
+        // SessionUseCase.getSessionByStatus({
+        //   status: SessionStatus.PENDING
+        //   dto
+        // })
+        // FIND SESSION
+        // logger.info('Find user session:: ' + ProcessStatus.PENDING)
+        // const  = await SessionService.getByStatus({
+        //   status: SessionStatus.ACTIVE
+        // }, tx)
+      } catch (err) {
+        logger.error('Sign-In Error', { err })
+        throw err
       }
-      logger.info('Find User By Username:: ' + ProcessStatus.COMPLETE)
-
-
-      SessionUseCase.getSessionByStatus({
-        status: SessionStatus.PENDING
-      })
-      // FIND SESSION
-      // logger.info('Find user session:: ' + ProcessStatus.PENDING)
-      // const  = await SessionService.getByStatus({
-      //   status: SessionStatus.ACTIVE
-      // }, tx)
-
-
     })
   }
 }

@@ -1,10 +1,11 @@
 import { userTable } from '~/server/database/schema'
 import { db as database, type DatabaseTransaction } from '~/server/database/client'
-import type { CreateUserDto, CreateUserResponse, UpdateUserDto, UpdateUserResponse, UserSafety } from '~/shared/dto/user.dto'
+import type { CreateUserDto, CreateUserResponse, UpdateUserDto, UpdateUserResponse, User, UserSafety } from '~/shared/dto/user.dto'
 import { dateISO } from '~/shared/utils/datetime'
 import { serverEnv as env } from '~/server/config/env/env.server';
 import { eq } from 'drizzle-orm';
 import { SelectDatabaseAdapter } from '~/server/database/helpers';
+import { _ } from '~/shared/const';
 
 export const UserService = {
   async getList(tx?: DatabaseTransaction): Promise<UserSafety[]> {
@@ -38,13 +39,18 @@ export const UserService = {
     return user
   },
 
-  async getByUsername(username: string, tx?: DatabaseTransaction): Promise<UserSafety | null> {
+  async getByUsername(
+    username: string,
+    tx?: DatabaseTransaction
+  ): Promise<User | null> {
     const db = SelectDatabaseAdapter(database, tx)
     const [user] = await db
       .select({
         id: userTable.id,
+        username: userTable.username,
         firstName: userTable.firstName,
         lastName: userTable.lastName,
+        masterPasswordHash: userTable.masterPasswordHash,
         createdAt: userTable.createdAt,
         updatedAt: userTable.updatedAt,
         deletedAt: userTable.deletedAt,
