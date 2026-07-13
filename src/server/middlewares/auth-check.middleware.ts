@@ -144,14 +144,14 @@ export const AuthCheckMiddleware = defineMiddleware(
       sessionsMap.ACTIVE.length > 0
       && sessionsMap.PENDING.length > 0
     ) {
-
       logger.error('[STAGE_5]:: !VIOLATION!: ACTIVE.count > 0 && PENDING.count > 0')
       logger.error('[STAGE_5]:: Terminate all user sessions')
+
       for (const s of sessions) {
         logger.error('[STAGE_5]:: Terminate: ' + s.id)
         await SessionService.terminate(s.id)
       }
-      logger.error('[STAGE_5]:: Redirect to: ' + AppRoutes.client.SignIn)
+      logger.info('[STAGE_5]:: Redirect to: ' + AppRoutes.client.SignIn)
       return RedirectToSignIn(ctx)
     }
 
@@ -167,11 +167,15 @@ export const AuthCheckMiddleware = defineMiddleware(
       ) {
 
         // Сессия ещё не просрочена
-        logger.error('[STAGE_6]:: PENDING session is exists', { sessionId: session.id })
+        logger.info('[STAGE_6]:: PENDING session is exists', { sessionId: session.id })
+        logger.info('[STAGE_6]:: Redirect to: ' + AppRoutes.client.SignIn)
         return RedirectToSignIn(ctx)
       }
       else {
         logger.error('[STAGE_6]:: PENDING session is expired', { sessionId: session?.id })
+
+        logger.info('[STAGE_6]:: Redirect to: ' + AppRoutes.client.SignIn)
+        return RedirectToSignIn(ctx)
       }
     }
 
