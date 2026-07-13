@@ -23,12 +23,12 @@ export const POST: APIRoute = async ({ request }) => {
   logger.debug('TEST', { data })
 
   if (!data) throw new Error('DATA IS NOT DEFINED')
-  // await SignupUseCase.createUserKey({
-  //   firstName: data?.firstName,
-  //   lastName: data?.lastName,
-  //   password: data?.password,
-  //   username: data?.username,
-  // }, logger)
+  await SignupUseCase.createUserKey({
+    firstName: data?.firstName,
+    lastName: data?.lastName,
+    password: data?.password,
+    username: data?.username,
+  }, logger)
 
 
   return Response.json(
