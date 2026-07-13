@@ -186,9 +186,9 @@ export const AuthCheckMiddleware = defineMiddleware(
     }
 
     // Обработка ACTIVE сессии
-    if (sessionsMap.PENDING?.length > 0) {
+    if (sessionsMap.ACTIVE?.length > 0) {
       logger.error('[STAGE_6]:: Handle ACTIVE session if it\'s exists')
-      const session = await SessionUseCase.handlerPendingSession(
+      const session = await SessionUseCase.handlerActiveSession(
         tokenPayload.userId,
         logger,
       )
@@ -198,12 +198,10 @@ export const AuthCheckMiddleware = defineMiddleware(
       ) {
 
         // Сессия ещё не просрочена
-        logger.info('[STAGE_6]:: PENDING session is exists', { sessionId: session.id })
-        logger.info('[STAGE_6]:: Redirect to: ' + AppRoutes.client.SignIn)
-        return RedirectToSignIn(ctx, next)
+        logger.info('[STAGE_6]:: ACTIVE session is exists', { sessionId: session.id })
       }
       else {
-        logger.error('[STAGE_6]:: PENDING session is expired', { sessionId: session?.id })
+        logger.error('[STAGE_6]:: ACTIVE session is expired', { sessionId: session?.id })
 
         logger.info('[STAGE_6]:: Redirect to: ' + AppRoutes.client.SignIn)
         return RedirectToSignIn(ctx, next)
