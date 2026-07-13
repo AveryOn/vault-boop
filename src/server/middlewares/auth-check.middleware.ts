@@ -1,13 +1,14 @@
 import { defineMiddleware } from 'astro:middleware'
-import { CookieName, ProcessStatus, SessionStatus } from '~/shared/const'
+import { ProcessStatus, SessionStatus } from '~/shared/const'
 import { Logger } from '~/shared/logger/logger.client'
-import { AccessTokenService, SessionService } from '~/server/services'
+import { SessionService } from '~/server/services'
 import { clientRoutes } from '~/shared/router/client.routes'
 import { decryptData } from '../utils/crypto'
 import type { AccessTokenPayload } from '~/shared/dto/access-token.dto'
 import type { APIContext } from 'astro'
 import type { Session } from '~/shared/dto/session.dto'
 import { SessionUseCase } from '../use-cases/session.use-case'
+import { AppRoutes } from '~/shared/router'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type MiddlewareCtx = APIContext<Record<string, any>, Record<string, string | undefined>>
@@ -35,55 +36,83 @@ export const AuthCheckMiddleware = defineMiddleware(
     const url = new URL(ctx.request.url)
 
     const logger = new Logger('MIDDLEWARE:AuthCheck:RUN')
+
+    logger.info('[STAGE_1]:: Exclude the accessToken from cookies')
     // const accessToken = ctx.cookies.get(CookieName['accessToken'])?.value
     const accessToken = 'asdasd'
 
     if (!accessToken) {
-      logger.warn('Access Token is not found!')
+      logger.warn('[STAGE_1]:: Access Token is not found!')
       return RedirectToSignIn(ctx)
     }
 
     // Проверка токена доступа:
+    logger.info('[STAGE_2]:: Decryption the AccessToken. Exclude a payload')
     const tokenPayload: AccessTokenPayload | null = await decryptAccessToken(accessToken, logger)
     if (!tokenPayload) {
-      logger.warn('Failed to exclude the token payload data')
+      logger.warn('[STAGE_2]:: Failed to exclude the token payload data')
       return RedirectToSignIn(ctx)
     }
+    logger.info('[STAGE_2]:: Decryption Complete', { tokenPayload })
+
 
     // Проверка сессий пользователя
+    logger.info('[STAGE_3]:: Fetch all sessions by UserId', { userId: tokenPayload.userId })
     const sessions = await SessionService.getByUserId(tokenPayload.userId)
 
     // Получение и проверка текущей сессии привязанной к токену доступа
+    logger.info('[STAGE_3]:: Exclude Current session from sessions', { sessionId: tokenPayload.sessionId })
+
     const currentSession = sessions.find(s => s.id === tokenPayload.sessionId) ?? null
     // Если по такому ID сессии не существует то это нарушение
     if (!currentSession) {
+      logger.error('[STAGE_3]:: Violation: session with such ID is not found')
       return RedirectToSignIn(ctx)
     }
 
     //  Группировка сессий по статусу
-    const sessionsMap = sessions.reduce<
-      Record<keyof typeof SessionStatus, Session[]>
-    >((acc, session) => {
+    logger.info('[STAGE_4]:: Grouping By session statuses')
+
+    type SessionMap = Record<keyof typeof SessionStatus, Session[]>
+    const sessionsMap = sessions.reduce<SessionMap>((acc, session) => {
       acc[session.status as SessionStatus] ??= []
       acc[session.status as SessionStatus].push(session)
 
       return acc
-    }, {} as Record<keyof typeof SessionStatus, Session[]>)
+    }, {} as SessionMap)
+
+    logger.info('[STAGE_4]:: Grouping Complete', {
+      ACTIVE: `${sessionsMap.ACTIVE.length} pc.`,
+      TERMINATED: `${sessionsMap.TERMINATED.length} pc.`,
+      EXPIRED: `${sessionsMap.EXPIRED.length} pc.`,
+      PENDING: `${sessionsMap.PENDING.length} pc.`,
+    })
+
 
     /*
      Если у пользователя неожиданное состояние сессий (когда есть и ACTIVE и PENDING сессии)
      то делаем деактивацию всех сессий пользователя
      */
+    logger.info('[STAGE_5]:: Check Violation Sessions: ACTIVE.count > 0 && PENDING.count > 0', {
+      ACTIVE_SESSION_COUNT: sessionsMap.ACTIVE.length,
+      PENDING_SESSION_COUNT: sessionsMap.PENDING.length,
+    })
     if (
       sessionsMap.ACTIVE.length > 0
       && sessionsMap.PENDING.length > 0
     ) {
+
+      logger.error('[STAGE_5]:: !VIOLATION!: ACTIVE.count > 0 && PENDING.count > 0')
+      logger.error('[STAGE_5]:: Terminate all user sessions')
       for (const s of sessions) {
+        logger.error('[STAGE_5]:: Terminate: ' + s.id)
         await SessionService.terminate(s.id)
       }
+      logger.error('[STAGE_5]:: Redirect to: ' + AppRoutes.client.SignIn)
       return RedirectToSignIn(ctx)
     }
 
+    logger.error('[STAGE_6]:: Handle PENDING session if it\'s exists')
     if (sessionsMap.PENDING?.length > 0) {
       const session = await SessionUseCase.handlerPendingSession(
         tokenPayload.userId,
@@ -93,7 +122,13 @@ export const AuthCheckMiddleware = defineMiddleware(
         session?.expiresAt &&
         new Date(session.expiresAt).getTime() > Date.now()
       ) {
+
         // Сессия ещё не просрочена
+        logger.error('[STAGE_6]:: PENDING session is exists', { sessionId: session.id })
+        return RedirectToSignIn(ctx)
+      }
+      else {
+        logger.error('[STAGE_6]:: PENDING session is expired', { sessionId: session?.id })
       }
     }
 
