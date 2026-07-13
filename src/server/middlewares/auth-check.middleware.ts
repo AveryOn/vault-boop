@@ -40,23 +40,24 @@ function normalizePath(path: string): string {
 async function decryptAccessToken(accessToken: string, logger: Logger): Promise<AccessTokenPayload | null> {
   try {
     return JSON.parse(await decryptData(accessToken, 'access')) as AccessTokenPayload
-  } catch (err) {
-    logger.error('AccessToken decryption Error:: ' + ProcessStatus.ERROR, { err })
+  } catch {
+    logger.error('AccessToken decryption Error:: ' + ProcessStatus.ERROR)
     return null
   }
 }
 
 export const AuthCheckMiddleware = defineMiddleware(
   async (ctx, next) => {
+    const logger = new Logger('MIDDLEWARE:AuthCheck:RUN')
     const url = new URL(ctx.request.url)
-    const SignUpPath = normalizePath(clientRoutes.SignUp)
     const pathname = normalizePath(url.pathname)
 
-    if (pathname === SignUpPath) {
+    // Если открывается страница SignUp то минуем все проверки
+    if (pathname === normalizePath(clientRoutes.SignUp)) {
+      logger.info('Redirect to: ' + AppRoutes.client.SignUp)
       return next()
     }
 
-    const logger = new Logger('MIDDLEWARE:AuthCheck:RUN')
 
     logger.info('[STAGE_1]:: Exclude the accessToken from cookies')
     // const accessToken = ctx.cookies.get(CookieName['accessToken'])?.value
