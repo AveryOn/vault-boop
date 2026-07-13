@@ -6,9 +6,8 @@ import { _ } from '~/shared/const'
 import { HttpStatusCode } from 'axios'
 import { throwZodError } from '~/server/plugins/zod.plugin'
 import { signInDto } from '~/shared/dto/auth.dto'
-import { AuthUseCase } from '~/server/use-cases/auth.use-case'
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, locals }) => {
   const logger = new Logger('HTTP:POST:Auth.Sign-In')
 
   const body = await request.json()
@@ -27,7 +26,9 @@ export const POST: APIRoute = async ({ request }) => {
     throw new Error('DATA IS NOT DEFINED')
   }
 
-  console.debug("ASF:ASFASJNKFKJSBSUFAS")
+  console.debug("ASTRO_LOCALS_CONTEXT", {
+    ...locals
+  })
   // await AuthUseCase.signIn({
   //   password: data?.password,
   //   username: data?.username,

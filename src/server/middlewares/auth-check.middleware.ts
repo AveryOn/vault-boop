@@ -68,6 +68,13 @@ export const AuthCheckMiddleware = defineMiddleware(
     const url = new URL(ctx.request.url)
     const pathname = normalizePath(url.pathname)
 
+    ctx.locals.ua = ctx.request.headers.get('user-agent') ?? undefined
+    ctx.locals.ip =
+      ctx.request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
+      ?? ctx.request.headers.get('x-real-ip')
+      ?? ctx.clientAddress
+      ?? undefined
+
     if (PUBLIC_ROUTES.includes(pathname)) {
       return next()
     }
@@ -136,6 +143,9 @@ export const AuthCheckMiddleware = defineMiddleware(
       logger.info('[STAGE_3]:: Redirect to: ' + AppRoutes.client.SignIn)
       return rejectUnauthorized(ctx)
     }
+
+    // Сохранение пользователя в CTX
+    ctx.locals.userId = userFromDb.id
 
     // Проверка сессий пользователя
     logger.info('[STAGE_3]:: Fetch all sessions by UserId', { userId: tokenPayload.userId })
