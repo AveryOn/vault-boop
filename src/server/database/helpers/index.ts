@@ -1,6 +1,6 @@
 import { sql } from 'drizzle-orm'
 import { integer, text } from 'drizzle-orm/sqlite-core'
-import type { DatabaseAdapter } from '~/server/database/client'
+import { db, type DatabaseAdapter, type DatabaseTransaction } from '~/server/database/client'
 
 export const id = () =>
   text('id')
@@ -19,4 +19,17 @@ export function SelectDatabaseAdapter(
   adapter?: DatabaseAdapter,
 ): DatabaseAdapter {
   return adapter ?? db
+}
+
+export function completeWithTransaction<T>(
+  func: (tx: DatabaseTransaction) => Promise<T>,
+  tx?: DatabaseTransaction,
+): Promise<T> {
+  if (tx) {
+    return func(tx)
+  }
+
+  return db.transaction(async trx => {
+    return func(trx)
+  })
 }

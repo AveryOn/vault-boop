@@ -1,5 +1,5 @@
 export function dateISO() {
-  return new Date().toDateString()
+  return new Date().toISOString()
 }
 export type TimeUnit =
   | 'ms' // milliseconds
