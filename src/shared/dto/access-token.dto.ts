@@ -19,4 +19,7 @@ export interface AccessTokenPayload {
   sessionId: string
   tokenId: string
   username: string
+  deviceId: string
+  ua: string
+  ip: string
 }
