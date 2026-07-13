@@ -57,6 +57,7 @@ export const AuthCheckMiddleware = defineMiddleware(
       logger.warn('[STAGE_2]:: Failed to exclude the token payload data')
       return RedirectToSignIn(ctx)
     }
+    // Если payload токена получилось извлечь без ошибок
     else {
       logger.info('[STAGE_2]:: Decryption Complete', { tokenPayload })
       logger.info('[STAGE_2]:: Check AccessToken by its ID')
@@ -75,10 +76,13 @@ export const AuthCheckMiddleware = defineMiddleware(
 
       logger.info('[STAGE_2]:: Compare UserId from the AccessToken with the UserId from the AccessTokenPayload')
       if (tokenFromDb.userId !== tokenPayload.userId) {
-        logger.info('[STAGE_2]:: UserIds are not matches!', {
+        logger.error('[STAGE_2]:: UserIds are not matches!', {
           cookiesTokenUserId: tokenPayload.userId,
           dbTokenUserId: tokenFromDb.userId,
         })
+      }
+      else {
+        logger.info('[STAGE_2]:: UserIDs is matches. Everything is fine!')
       }
     }
 
