@@ -61,6 +61,7 @@ export const AuthCheckMiddleware = defineMiddleware(
     else {
       logger.info('[STAGE_2]:: Decryption Complete', { tokenPayload })
       logger.info('[STAGE_2]:: Check AccessToken by its ID')
+
       const tokenFromDb = await AccessTokenService.getById(tokenPayload.tokenId)
       if (!tokenFromDb) {
         logger.error('[STAGE_2]:: Token with such ID is not found in DB')
@@ -103,10 +104,13 @@ export const AuthCheckMiddleware = defineMiddleware(
     // Получение и проверка текущей сессии привязанной к токену доступа
     logger.info('[STAGE_3]:: Exclude Current session from sessions', { sessionId: tokenPayload.sessionId })
 
+    logger.info('[STAGE_3]:: Find the session by sessionId and userId')
     const currentSession = sessions.find(s => s.id === tokenPayload.sessionId && s.userId === tokenPayload.userId) ?? null
     // Если по такому ID сессии не существует то это нарушение
     if (!currentSession) {
-      logger.error('[STAGE_3]:: Violation: session with such ID is not found')
+      logger.error('[STAGE_3]:: Violation: session with such sessionId and userId is not found')
+
+      logger.info('[STAGE_3]:: Redirect to: ' + AppRoutes.client.SignIn)
       return RedirectToSignIn(ctx)
     }
 
