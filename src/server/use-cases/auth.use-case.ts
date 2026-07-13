@@ -27,7 +27,7 @@ export const AuthUseCase = {
         firstName: dto.firstName,
         lastName: dto.lastName,
         password: await hashPassword(dto.password),
-        username: dto.password,
+        username: dto.username,
       }, tx)
       logger.info('Create new user:: ' + ProcessStatus.COMPLETE)
 
