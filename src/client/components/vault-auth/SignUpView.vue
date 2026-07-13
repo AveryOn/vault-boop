@@ -154,7 +154,7 @@ async function submit(): Promise<void> {
             @input="undoError('repeatPassword')" />
 
           <div class="w-full flex justify-center mt-auto mb-[24px]">
-            <ButtonUI type="submit" class="w-[50%]" :disabled="isLoading">
+            <ButtonUI type="submit" class="w-[50%]" :disabled="isLoading" :size="'large'">
               {{ isLoading ? 'Loading...' : 'Submit' }}
             </ButtonUI>
           </div>
