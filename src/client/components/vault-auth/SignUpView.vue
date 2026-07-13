@@ -5,6 +5,7 @@ import InputUI from '~/client/components/shared/InputUI.vue'
 import ButtonUI from '~/client/components/shared/ButtonUI.vue'
 import { useToast } from '~/client/composables/useToast'
 import { AuthApi } from '~/client/api/auth.api'
+import { AppRoutes } from '~/shared/router'
 
 const toast = useToast()
 
@@ -85,7 +86,7 @@ function undoError(field: keyof typeof formData.value): void {
 }
 
 function goToSignIn(): void {
-  window.location.href = '/example/auth/signin'
+  window.location.href = AppRoutes.client.SignIn
 }
 
 async function submit(): Promise<void> {
@@ -169,7 +170,7 @@ async function submit(): Promise<void> {
             Вы успешно зарегистрировали аккаунт, далее выполните вход в систему.
           </p>
 
-          <ButtonUI type="button" class="w-[70%]" @click="goToSignIn">
+          <ButtonUI type="button" class="w-[50%] mx-auto!" :size="'large'" @click="goToSignIn">
             Sign In
           </ButtonUI>
         </div>
