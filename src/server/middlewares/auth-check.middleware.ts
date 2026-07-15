@@ -1,12 +1,9 @@
 import { defineMiddleware } from 'astro:middleware'
-import { CookieName, ProcessStatus } from '~/shared/const'
+import { CookieName } from '~/shared/const'
 import { Logger } from '~/shared/logger/logger.client'
-import { AccessTokenService, SessionService, UserService } from '~/server/services'
-import { clientRoutes } from '~/shared/router/client.routes'
 import { decryptData } from '~/server/utils/crypto'
 import type { AccessTokenPayload } from '~/shared/dto/access-token.dto'
 import type { APIContext } from 'astro'
-import { AppRoutes } from '~/shared/router'
 
 // function rejectUnauthorized(ctx: MiddlewareCtx): Response {
 //   const pathname = normalizePath(new URL(ctx.request.url).pathname)
