@@ -19,5 +19,6 @@ export enum SessionStatus {
 }
 
 export enum CookieName {
-  accessToken = 'accessToken'
+  accessToken = 'accessToken',
+  deviceId = 'deviceId',
 }

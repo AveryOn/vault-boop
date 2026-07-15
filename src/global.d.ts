@@ -35,12 +35,12 @@ declare module '@jamescoyle/vue-icon' { }
 
 declare namespace App {
   interface Locals {
-    userId?: string
-    sessionId?: string
-    tokenId?: string
-    username?: string
-    deviceId?: string
-    ua?: string
-    ip?: string
+    ip?: string | null
+    ua?: string | null
+    deviceId?: string | null
+    userId?: string | null
+    sessionId?: string | null
+    tokenId?: string | null
+    username?: string | null
   }
 }

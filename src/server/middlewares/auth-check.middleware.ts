@@ -1,21 +1,12 @@
 import { defineMiddleware } from 'astro:middleware'
-import { CookieName, ProcessStatus, SessionStatus } from '~/shared/const'
+import { CookieName, ProcessStatus } from '~/shared/const'
 import { Logger } from '~/shared/logger/logger.client'
 import { AccessTokenService, SessionService, UserService } from '~/server/services'
 import { clientRoutes } from '~/shared/router/client.routes'
 import { decryptData } from '~/server/utils/crypto'
 import type { AccessTokenPayload } from '~/shared/dto/access-token.dto'
 import type { APIContext } from 'astro'
-import type { Session } from '~/shared/dto/session.dto'
-import { SessionUseCase } from '~/server/use-cases/session.use-case'
 import { AppRoutes } from '~/shared/router'
-
-const PUBLIC_ROUTES = [
-  clientRoutes.SignIn,
-  clientRoutes.SignUp,
-  '/api/auth/signin',
-  '/api/auth/signup',
-].map(normalizePath)
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type MiddlewareCtx = APIContext<Record<string, any>, Record<string, string | undefined>>
@@ -25,41 +16,60 @@ function normalizePath(path: string): string {
 }
 
 /** Дешифрование токена доступа. Извлечение payload токена */
-async function decryptAccessToken(accessToken: string, logger: Logger): Promise<AccessTokenPayload | null> {
+async function excludesTokenPayload(accessToken: string | null): Promise<AccessTokenPayload | null> {
   try {
-    return JSON.parse(await decryptData(accessToken, 'access')) as AccessTokenPayload
+    const token = accessToken ? accessToken : 'stub';
+    return JSON.parse(await decryptData(token, 'access'))
   } catch {
-    logger.error('AccessToken decryption Error:: ' + ProcessStatus.ERROR)
     return null
   }
 }
 
-function rejectUnauthorized(ctx: MiddlewareCtx): Response {
-  const pathname = normalizePath(new URL(ctx.request.url).pathname)
+// function rejectUnauthorized(ctx: MiddlewareCtx): Response {
+//   const pathname = normalizePath(new URL(ctx.request.url).pathname)
 
-  ctx.cookies.delete(CookieName.accessToken, {
-    path: '/',
-  })
+//   ctx.cookies.delete(CookieName.accessToken, {
+//     path: '/',
+//   })
 
-  if (pathname.startsWith('/api/')) {
-    return Response.json(
-      {
-        success: false,
-        error: 'Unauthorized',
-      },
-      {
-        status: 401,
-      },
-    )
-  }
+//   if (pathname.startsWith('/api/')) {
+//     return Response.json(
+//       {
+//         success: false,
+//         error: 'Unauthorized',
+//       },
+//       {
+//         status: 401,
+//       },
+//     )
+//   }
 
-  if (pathname === normalizePath(clientRoutes.SignIn)) {
-    return new Response(null, {
-      status: 401,
-    })
-  }
+//   if (pathname === normalizePath(clientRoutes.SignIn)) {
+//     return new Response(null, {
+//       status: 401,
+//     })
+//   }
 
-  return ctx.redirect(clientRoutes.SignIn)
+//   return ctx.redirect(clientRoutes.SignIn)
+// }
+
+function excludesUserAgent(ctx: MiddlewareCtx): string | null {
+  return ctx.request.headers.get('user-agent') ?? null
+}
+
+function excludesIP(ctx: MiddlewareCtx): string | null {
+  return ctx.request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
+    ?? ctx.request.headers.get('x-real-ip')
+    ?? ctx.clientAddress
+    ?? null
+}
+
+function excludesAccessToken(ctx: MiddlewareCtx): string | null {
+  return ctx.cookies.get(CookieName['accessToken'])?.value ?? null
+}
+
+function excludesDeviceId(ctx: MiddlewareCtx): string | null {
+  return ctx.cookies.get(CookieName['deviceId'])?.value ?? null
 }
 
 export const AuthCheckMiddleware = defineMiddleware(
@@ -68,204 +78,39 @@ export const AuthCheckMiddleware = defineMiddleware(
     const url = new URL(ctx.request.url)
     const pathname = normalizePath(url.pathname)
 
-    ctx.locals.ua = ctx.request.headers.get('user-agent') ?? undefined
-    ctx.locals.ip =
-      ctx.request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
-      ?? ctx.request.headers.get('x-real-ip')
-      ?? ctx.clientAddress
-      ?? undefined
+    // Excludes User-Agent
+    const ua = excludesUserAgent(ctx)
 
-    if (PUBLIC_ROUTES.includes(pathname)) {
-      return next()
-    }
+    // Excludes IP
+    const ip = excludesIP(ctx)
 
-    // Если открывается страница SignUp то минуем все проверки
-    if (pathname === normalizePath(clientRoutes.SignUp)) {
-      logger.info('Redirect to: ' + AppRoutes.client.SignUp)
-      return next()
-    }
+    //  Excludes Device ID
+    const deviceId = excludesDeviceId(ctx)
 
+    // Excludes AccessToken
     logger.info('[STAGE_1]:: Exclude the accessToken from cookies')
-    const accessToken = ctx.cookies.get(CookieName['accessToken'])?.value
+    const accessToken = excludesAccessToken(ctx)
 
-    if (!accessToken) {
-      logger.warn('[STAGE_1]:: Access Token is not found!')
-      return rejectUnauthorized(ctx)
-    }
-    else {
-      logger.info('[STAGE_1]:: AccessToken is excluded from cookies', { accessToken })
-    }
+    // Excludes Token Payload
+    const TokenPayload = await excludesTokenPayload(accessToken)
 
 
-    // Проверка токена доступа:
-    logger.info('[STAGE_2]:: Decryption the AccessToken. Exclude a payload')
-    const tokenPayload: AccessTokenPayload | null = await decryptAccessToken(accessToken, logger)
-    if (!tokenPayload) {
-      logger.warn('[STAGE_2]:: Failed to exclude the token payload data')
-      return rejectUnauthorized(ctx)
-    }
-    // Если payload токена получилось извлечь без ошибок
-    else {
-      logger.info('[STAGE_2]:: Decryption Complete', { tokenPayload })
-      logger.info('[STAGE_2]:: Check AccessToken by its ID in Database')
-
-      const tokenFromDb = await AccessTokenService.getById(tokenPayload.tokenId)
-      if (!tokenFromDb) {
-        logger.error('[STAGE_2]:: Token with such ID is not found in DB')
-        logger.info('[STAGE_2]:: Redirect to: ' + AppRoutes.client.SignIn)
-        return rejectUnauthorized(ctx)
-      }
-      if (!tokenFromDb?.archivedAt && tokenFromDb.token !== accessToken) {
-        logger.error('[STAGE_2]:: The token from the cookie NOT matches the token from the Database')
-      }
-      else {
-        logger.info('[STAGE_2]:: The token from the cookie matches the token from the Database')
-      }
-
-      logger.info('[STAGE_2]:: Compare UserId from the AccessToken with the UserId from the AccessTokenPayload')
-      if (tokenFromDb.userId !== tokenPayload.userId) {
-        logger.error('[STAGE_2]:: UserIds are not matches!', {
-          cookiesTokenUserId: tokenPayload.userId,
-          dbTokenUserId: tokenFromDb.userId,
-        })
-      }
-      else {
-        logger.info('[STAGE_2]:: UserIDs is matches. Everything is fine!')
-      }
+    // Собираем все необходимые данные в один объект
+    const LocalContext: App.Locals = {
+      ua,
+      ip,
+      deviceId,
+      userId: TokenPayload?.userId ?? null,
+      sessionId: TokenPayload?.sessionId ?? null,
+      tokenId: TokenPayload?.tokenId ?? null,
+      username: TokenPayload?.username ?? null,
     }
 
-    // Проверка пользователя
-    logger.info('[STAGE_3]:: Checks userId', { userId: tokenPayload.userId })
-    const userFromDb = await UserService.getById(tokenPayload.userId)
-    // Если пользователя с таким ID нет
-    if (!userFromDb) {
-      logger.error('[STAGE_3]:: User with such ID is not found in Database')
-      logger.info('[STAGE_3]:: Redirect to: ' + AppRoutes.client.SignIn)
-      return rejectUnauthorized(ctx)
-    }
-
-    // Сохранение пользователя в CTX
-    ctx.locals.userId = userFromDb.id
-
-    // Проверка сессий пользователя
-    logger.info('[STAGE_3]:: Fetch all sessions by UserId', { userId: tokenPayload.userId })
-    const sessions = await SessionService.getByUserId(tokenPayload.userId)
-
-
-    // Получение и проверка текущей сессии привязанной к токену доступа
-    // Извлечение текущей сессии
-    logger.info('[STAGE_3]:: Exclude Current session from sessions', { sessionId: tokenPayload.sessionId })
-    const currentSession = sessions.find(s => s.id === tokenPayload.sessionId && s.userId === tokenPayload.userId) ?? null
-    logger.info('[STAGE_3]:: Find the session by sessionId and userId')
-
-    // Если по такому ID сессии не существует то это нарушение
-    if (!currentSession) {
-      logger.error('[STAGE_3]:: Violation: session with such sessionId and userId is not found')
-
-      logger.info('[STAGE_3]:: Redirect to: ' + AppRoutes.client.SignIn)
-      return rejectUnauthorized(ctx)
-    }
-
-    // Если ID токена доступа из payload не сходится с ID токена доступа в Сессии
-    logger.info('[STAGE_3]:: Matching check tokenPayload.tokenId === currentSession.accessTokenId')
-    if (currentSession.accessTokenId !== tokenPayload.tokenId) {
-      logger.error('[STAGE_3]:: Matching Error: tokenPayload.tokenId !== currentSession.accessTokenId')
-
-      logger.info('[STAGE_3]:: Redirect to: ' + AppRoutes.client.SignIn)
-      return rejectUnauthorized(ctx)
-    }
-
-    //  Группировка сессий по статусу
-    logger.info('[STAGE_4]:: Grouping By session statuses')
-
-    type SessionMap = Record<keyof typeof SessionStatus, Session[]>
-    const sessionsMap = sessions.reduce<SessionMap>((acc, session) => {
-      acc[session.status as SessionStatus] ??= []
-      acc[session.status as SessionStatus].push(session)
-
-      return acc
-    }, {} as SessionMap)
-
-    logger.info('[STAGE_4]:: Grouping Complete', {
-      ACTIVE: `${sessionsMap.ACTIVE.length} pc.`,
-      TERMINATED: `${sessionsMap.TERMINATED.length} pc.`,
-      EXPIRED: `${sessionsMap.EXPIRED.length} pc.`,
-      PENDING: `${sessionsMap.PENDING.length} pc.`,
+    logger.info('Excludes require data from Request', {
+      ...LocalContext,
+      pathname,
     })
 
-    /*
-     Если у пользователя неожиданное состояние сессий (когда есть и ACTIVE и PENDING сессии)
-     то делаем деактивацию всех сессий пользователя
-     */
-    logger.info('[STAGE_5]:: Check Violation Sessions: ACTIVE.count > 0 && PENDING.count > 0', {
-      ACTIVE_SESSION_COUNT: sessionsMap.ACTIVE.length,
-      PENDING_SESSION_COUNT: sessionsMap.PENDING.length,
-    })
-    if (
-      sessionsMap.ACTIVE.length > 0
-      && sessionsMap.PENDING.length > 0
-    ) {
-      logger.error('[STAGE_5]:: !VIOLATION!: ACTIVE.count > 0 && PENDING.count > 0')
-      logger.error('[STAGE_5]:: Terminate all user sessions')
-
-      for (const s of sessions) {
-        logger.error('[STAGE_5]:: Terminate: ' + s.id)
-        await SessionService.terminate(s.id)
-      }
-      logger.info('[STAGE_5]:: Redirect to: ' + AppRoutes.client.SignIn)
-      // TODO remove cookies
-      return rejectUnauthorized(ctx)
-    }
-
-    // Обработка PENDING сессии
-    if (sessionsMap.PENDING?.length > 0) {
-      logger.error('[STAGE_6]:: Handle PENDING session if it\'s exists')
-      const session = await SessionUseCase.handlerPendingSession(
-        tokenPayload.userId,
-        logger,
-      )
-      if (
-        session?.expiresAt &&
-        new Date(session.expiresAt).getTime() > Date.now()
-      ) {
-
-        // Сессия ещё не просрочена
-        logger.info('[STAGE_6]:: PENDING session is exists', { sessionId: session.id })
-        logger.info('[STAGE_6]:: Redirect to: ' + AppRoutes.client.SignIn)
-        return rejectUnauthorized(ctx)
-      }
-      // Сессия просрочена
-      else {
-        logger.error('[STAGE_6]:: PENDING session is expired', { sessionId: session?.id })
-
-        logger.info('[STAGE_6]:: Redirect to: ' + AppRoutes.client.SignIn)
-        return rejectUnauthorized(ctx)
-      }
-    }
-
-    // Обработка ACTIVE сессии
-    if (sessionsMap.ACTIVE?.length > 0) {
-      logger.error('[STAGE_6]:: Handle ACTIVE session if it\'s exists')
-      const session = await SessionUseCase.handlerActiveSession(
-        tokenPayload.userId,
-        logger,
-      )
-      if (
-        session?.expiresAt &&
-        new Date(session.expiresAt).getTime() > Date.now()
-      ) {
-
-        // Сессия ещё не просрочена
-        logger.info('[STAGE_6]:: ACTIVE session is exists', { sessionId: session.id })
-      }
-      // Сессия просрочена
-      else {
-        logger.error('[STAGE_6]:: ACTIVE session is expired', { sessionId: session?.id })
-
-        logger.info('[STAGE_6]:: Redirect to: ' + AppRoutes.client.SignIn)
-        return rejectUnauthorized(ctx)
-      }
-    }
     return next()
   },
 )
