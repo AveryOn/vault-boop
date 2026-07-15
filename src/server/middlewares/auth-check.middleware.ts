@@ -8,23 +8,6 @@ import type { AccessTokenPayload } from '~/shared/dto/access-token.dto'
 import type { APIContext } from 'astro'
 import { AppRoutes } from '~/shared/router'
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type MiddlewareCtx = APIContext<Record<string, any>, Record<string, string | undefined>>
-
-function normalizePath(path: string): string {
-  return path !== '/' ? path.replace(/\/+$/, '') : path
-}
-
-/** Дешифрование токена доступа. Извлечение payload токена */
-async function excludesTokenPayload(accessToken: string | null): Promise<AccessTokenPayload | null> {
-  try {
-    const token = accessToken ? accessToken : 'stub';
-    return JSON.parse(await decryptData(token, 'access'))
-  } catch {
-    return null
-  }
-}
-
 // function rejectUnauthorized(ctx: MiddlewareCtx): Response {
 //   const pathname = normalizePath(new URL(ctx.request.url).pathname)
 
@@ -52,6 +35,23 @@ async function excludesTokenPayload(accessToken: string | null): Promise<AccessT
 
 //   return ctx.redirect(clientRoutes.SignIn)
 // }
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type MiddlewareCtx = APIContext<Record<string, any>, Record<string, string | undefined>>
+
+function normalizePath(path: string): string {
+  return path !== '/' ? path.replace(/\/+$/, '') : path
+}
+
+/** Дешифрование токена доступа. Извлечение payload токена */
+async function excludesTokenPayload(accessToken: string | null): Promise<AccessTokenPayload | null> {
+  try {
+    const token = accessToken ? accessToken : 'stub';
+    return JSON.parse(await decryptData(token, 'access'))
+  } catch {
+    return null
+  }
+}
 
 function excludesUserAgent(ctx: MiddlewareCtx): string | null {
   return ctx.request.headers.get('user-agent') ?? null
