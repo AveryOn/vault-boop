@@ -107,8 +107,8 @@ export const AuthCheckMiddleware = defineMiddleware(
     }
 
     logger.info('Excludes require data from Request', {
-      ...LocalContext,
       pathname,
+      ...LocalContext,
     })
 
     return next()
