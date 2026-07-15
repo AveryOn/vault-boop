@@ -13,6 +13,8 @@ export const AuthUseCase = {
   async signUp(dto: SignUpDto, logger: Logger) {
     return await db.transaction(async (tx) => {
       try {
+
+        // CHECK USER BY USERNAME
         logger.info('Find User By Username:: ' + ProcessStatus.PENDING)
         const existsUser = await UserService.getByUsername(dto.username, tx)
         if (existsUser) {
@@ -22,6 +24,7 @@ export const AuthUseCase = {
         logger.info('Find User By Username:: ' + ProcessStatus.COMPLETE)
 
 
+        // CREATE NEW USER
         logger.info('Create new user:: ' + ProcessStatus.PENDING)
         // Создание нового пользователя
         const newUser = await UserService.create({
@@ -33,6 +36,7 @@ export const AuthUseCase = {
         logger.info('Create new user:: ' + ProcessStatus.COMPLETE)
 
 
+        // GET ACTION BY ID
         logger.info('Get Action by name:: ' + ProcessStatus.PENDING)
         const action = await ActionService.getByName(ActionKey.SessionCreated, tx)
         if (!action) {
@@ -41,23 +45,16 @@ export const AuthUseCase = {
         }
         logger.info('Get Action by name:: ' + ProcessStatus.COMPLETE)
 
-
+        // CREATE NEW USER_ACTION
         logger.info('Create new User Action:: ' + ProcessStatus.PENDING)
-        const newUserAction = await UserActionService.create(
+        await UserActionService.create(
           { userId: newUser.id },
           { actionId: action.id, comment: ActionKey.SessionCreated },
           tx,
         )
         logger.info('Create new User Action:: ' + ProcessStatus.COMPLETE)
-
-
-        logger.info('Create new Session:: ' + ProcessStatus.PENDING)
-        const session = await SessionService.create({
-          lastUserActionId: newUserAction.id,
-          userId: newUser.id,
-        }, tx)
-        logger.info('Create new Session:: ' + ProcessStatus.COMPLETE, { session })
-      } catch (err) {
+      }
+      catch (err) {
         logger.error('Sign-Up Error', { err })
         throw err
       }
