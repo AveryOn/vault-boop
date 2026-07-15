@@ -21,7 +21,7 @@ export const SessionService = {
         lastUsedAt: now,
         lastUserActionId: dto.lastUserActionId,
         userId: dto.userId,
-        status: SessionStatus.PENDING,
+        status: SessionStatus.ACTIVE,
       })
       .returning()
 
