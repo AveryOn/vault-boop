@@ -15,7 +15,6 @@ export enum SessionStatus {
   TERMINATED = 'TERMINATED',
   EXPIRED = 'EXPIRED',
   ACTIVE = 'ACTIVE',
-  PENDING = 'PENDING',
 }
 
 export enum CookieName {
