@@ -2,7 +2,6 @@ import type { SignInDto, SignUpDto } from "~/shared/dto/auth.dto"
 import type { Logger } from "~/shared/logger/logger.client"
 import { db } from "~/server/database/client"
 import { hashPassword } from "~/server/utils/crypto"
-import { UserService } from '~/server/services/user.service';
 import { ActionRepo } from "~/server/repo/action.repo"
 import { UserActionRepo } from "~/server/repo/user-action.repo"
 import { ActionKey } from "~/shared/dto/action.dto"
@@ -69,7 +68,7 @@ export const AuthService = {
       try {
         // Найти пользователя по username
         logger.info('Find User By Username:: ' + ProcessStatus.PENDING)
-        const user = await UserService.getByUsername(dto.username, tx)
+        const user = await UserRepo.getByUsername(dto.username, tx)
         if (!user) {
           logger.error('User not found', { status: HttpStatusCode.NotFound })
           throw new Error('Not Found')
