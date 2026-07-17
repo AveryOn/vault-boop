@@ -73,22 +73,28 @@ export const AuthCheckMiddleware = defineMiddleware(
   async (ctx, next) => {
     const logger = new Logger('MIDDLEWARE:AuthCheck')
     const url = new URL(ctx.request.url)
+
+    logger.info('[STAGE_1]:: Exclude the Pathname from URL')
     const pathname = normalizePath(url.pathname)
 
     // Excludes User-Agent
+    logger.info('[STAGE_2]:: Exclude the User Agent from cookies')
     const ua = excludesUserAgent(ctx)
 
     // Excludes IP
+    logger.info('[STAGE_3]:: Exclude the IP from cookies')
     const ip = excludesIP(ctx)
 
     //  Excludes Device ID
+    logger.info('[STAGE_4]:: Exclude the deviceId from cookies')
     const deviceId = excludesDeviceId(ctx)
 
     // Excludes AccessToken
-    logger.info('[STAGE_1]:: Exclude the accessToken from cookies')
+    logger.info('[STAGE_5]:: Exclude the accessToken from cookies')
     const accessToken = excludesAccessToken(ctx)
 
     // Excludes Token Payload
+    logger.info('[STAGE_6]:: Exclude the token payload from accessToken')
     const TokenPayload = await excludesTokenPayload(accessToken)
 
 
