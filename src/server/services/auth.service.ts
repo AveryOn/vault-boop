@@ -3,10 +3,12 @@ import type { Logger } from "~/shared/logger/logger.client"
 import { db } from "~/server/database/client"
 import { hashPassword } from "~/server/utils/crypto"
 import { UserService } from '~/server/services/user.service';
-import { ActionService, UserActionService } from "~/server/services"
+import { ActionRepo } from "~/server/repo/action.repo"
+import { UserActionRepo } from "~/server/repo/user-action.repo"
 import { ActionKey } from "~/shared/dto/action.dto"
 import { ProcessStatus } from "~/shared/const";
 import { HttpStatusCode } from "axios";
+import { UserRepo } from "~/server/repo/user.repo";
 
 export const AuthService = {
 
@@ -16,7 +18,7 @@ export const AuthService = {
 
         // CHECK USER BY USERNAME
         logger.info('Find User By Username:: ' + ProcessStatus.PENDING)
-        const existsUser = await UserService.getByUsername(dto.username, tx)
+        const existsUser = await UserRepo.getByUsername(dto.username, tx)
         if (existsUser) {
           logger.error('Conflict: User with such username already exists')
           throw new Error('Conflict')
@@ -27,7 +29,7 @@ export const AuthService = {
         // CREATE NEW USER
         logger.info('Create new user:: ' + ProcessStatus.PENDING)
         // Создание нового пользователя
-        const newUser = await UserService.create({
+        const newUser = await UserRepo.create({
           firstName: dto.firstName,
           lastName: dto.lastName,
           password: await hashPassword(dto.password),
@@ -38,7 +40,7 @@ export const AuthService = {
 
         // GET ACTION BY ID
         logger.info('Get Action by name:: ' + ProcessStatus.PENDING)
-        const action = await ActionService.getByName(ActionKey.SessionCreated, tx)
+        const action = await ActionRepo.getByName(ActionKey.SessionCreated, tx)
         if (!action) {
           logger.error(`Action ${ActionKey.SessionCreated} not found`, { action: ActionKey.SessionCreated })
           throw new Error(`Action ${action} not found`)
@@ -47,7 +49,7 @@ export const AuthService = {
 
         // CREATE NEW USER_ACTION
         logger.info('Create new User Action:: ' + ProcessStatus.PENDING)
-        await UserActionService.create(
+        await UserActionRepo.create(
           { userId: newUser.id },
           { actionId: action.id, comment: ActionKey.SessionCreated },
           tx,
