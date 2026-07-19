@@ -167,6 +167,11 @@ export const AuthCheckMiddleware = defineMiddleware(
       username: TokenPayload?.username ?? null,
     })
 
+    logger.info('Excludes require data from Request', {
+      pathname,
+      ...LocalContext,
+    })
+
     // Валидация контекста запроса
     const isUserAuthorized = await validationContext(LocalContext, logger)
 
@@ -179,10 +184,7 @@ export const AuthCheckMiddleware = defineMiddleware(
     }
 
 
-    logger.info('Excludes require data from Request', {
-      pathname,
-      ...LocalContext,
-    })
+
 
     return next()
   },
