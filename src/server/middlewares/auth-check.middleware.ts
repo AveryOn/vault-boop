@@ -69,6 +69,16 @@ function excludesDeviceId(ctx: MiddlewareCtx): string | null {
   return ctx.cookies.get(CookieName['deviceId'])?.value ?? null
 }
 
+function fillLocalsContext(ctx: MiddlewareCtx, locals: App.Locals): App.Locals {
+  for (const key in locals) {
+    const k = key as keyof App.Locals
+    if (Object.prototype.hasOwnProperty.call(locals, k)) {
+      ctx.locals[k] = locals[k]
+    }
+  }
+  return locals
+}
+
 export const AuthCheckMiddleware = defineMiddleware(
   async (ctx, next) => {
     const logger = new Logger('MIDDLEWARE:AuthCheck')
@@ -99,7 +109,7 @@ export const AuthCheckMiddleware = defineMiddleware(
 
 
     // Собираем все необходимые данные в один объект
-    const LocalContext: App.Locals = {
+    const LocalContext = fillLocalsContext(ctx, {
       ua,
       ip,
       deviceId,
@@ -107,7 +117,9 @@ export const AuthCheckMiddleware = defineMiddleware(
       sessionId: TokenPayload?.sessionId ?? null,
       tokenId: TokenPayload?.tokenId ?? null,
       username: TokenPayload?.username ?? null,
-    }
+    })
+
+
 
     logger.info('Excludes require data from Request', {
       pathname,
