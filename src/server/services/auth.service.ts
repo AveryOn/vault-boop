@@ -119,6 +119,7 @@ export const AuthService = {
           logger?.error('[6]:: invalid_ip')
         }
 
+        // Если за время выполнения функции была хотя бы одно ошибка
         if (Object.values(ErrorMap).some(v => v.length > 0)) {
           logger?.error('ERROR', { ErrorMap })
           return false
@@ -126,7 +127,7 @@ export const AuthService = {
         return true
       }
       catch (err) {
-        logger?.error('Sign-Up Error', { err })
+        logger?.error('validateAuthContext:: ERROR', { err })
         return false
       }
 
