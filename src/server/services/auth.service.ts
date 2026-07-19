@@ -1,4 +1,3 @@
-import type { SignInDto, SignUpDto } from "~/shared/dto/auth.dto"
 import type { Logger } from "~/shared/logger/logger.client"
 import { db } from "~/server/database/client"
 import { UserService } from "~/server/services/user.service"
