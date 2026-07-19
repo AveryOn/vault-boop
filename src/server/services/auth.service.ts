@@ -19,8 +19,6 @@ export const AuthService = {
       username: [],
     }
 
-    logger?.info('ASDASFAFSAFASASFAAFS')
-
     return await db.transaction(async (tx) => {
       try {
         const now = dateISO()
@@ -128,8 +126,8 @@ export const AuthService = {
         }
         return true
       }
-      catch (err) {
-        logger?.error('validateAuthContext:: ERROR', { err })
+      catch {
+        logger?.error('validateAuthContext:: ERROR')
         return false
       }
 
