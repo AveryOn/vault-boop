@@ -26,5 +26,3 @@ export const signUpDto = z.object({
 
 })
 export type SignUpDto = z.infer<typeof signUpDto>
-
-

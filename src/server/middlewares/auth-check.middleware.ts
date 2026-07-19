@@ -4,6 +4,7 @@ import { Logger } from '~/shared/logger/logger.client'
 import { decryptData } from '~/server/utils/crypto'
 import type { AccessTokenPayload } from '~/shared/dto/access-token.dto'
 import type { APIContext } from 'astro'
+import z from 'zod'
 
 // function rejectUnauthorized(ctx: MiddlewareCtx): Response {
 //   const pathname = normalizePath(new URL(ctx.request.url).pathname)
@@ -79,6 +80,42 @@ function fillLocalsContext(ctx: MiddlewareCtx, locals: App.Locals): App.Locals {
   return locals
 }
 
+const BodyContextDto = z.object({
+  ua: z.string(),
+  ip: z.ipv4(),
+  deviceId: z.string(),
+  userId: z.uuid(),
+  sessionId: z.uuid(),
+  tokenId: z.uuid(),
+  username: z.string(),
+})
+
+/** Валидация контекста запроса */
+function validationContext(locals: App.Locals, logger: Logger) {
+  logger.info('[STAGE_7]:: Validation App.Locals Context')
+
+  const result = BodyContextDto.safeParse(locals)
+
+  // Моковый объект для имитации процесса (for timing attack)
+  let data: App.Locals = {
+    ua: 'MOCK_USER-AGENT',
+    ip: '127.0.0.1',
+    deviceId: 'device_id',
+    userId: crypto.randomUUID(),
+    sessionId: crypto.randomUUID(),
+    tokenId: crypto.randomUUID(),
+    username: 'mock_user_123',
+  }
+
+  if (result.success) {
+    data = result.data
+  }
+
+
+
+
+}
+
 export const AuthCheckMiddleware = defineMiddleware(
   async (ctx, next) => {
     const logger = new Logger('MIDDLEWARE:AuthCheck')
@@ -108,7 +145,7 @@ export const AuthCheckMiddleware = defineMiddleware(
     const TokenPayload = await excludesTokenPayload(accessToken)
 
 
-    // Собираем все необходимые данные в один объект
+    // Заполняем App.Locals контекст все необходимые данные в один объект
     const LocalContext = fillLocalsContext(ctx, {
       ua,
       ip,
@@ -118,6 +155,9 @@ export const AuthCheckMiddleware = defineMiddleware(
       tokenId: TokenPayload?.tokenId ?? null,
       username: TokenPayload?.username ?? null,
     })
+
+    // Валидация контекста запроса
+
 
 
 
