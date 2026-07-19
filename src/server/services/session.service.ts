@@ -37,8 +37,8 @@ export const SessionService = {
       return await SessionRepo.getByUserId(userId, tx)
 
     }
-    catch {
-      logger?.error('Get Sessions By UserID: ERROR')
+    catch (err) {
+      logger?.error('Get Sessions By UserID: ERROR', { err })
       return null
     }
   }
