@@ -26,5 +26,20 @@ export const SessionService = {
       logger?.error('Get Session By Params: ERROR', { err })
       return null
     }
+  },
+
+  async getAllByUserId(
+    userId: string,
+    tx?: DatabaseTransaction,
+    logger?: Logger
+  ) {
+    try {
+      return await SessionRepo.getByUserId(userId, tx)
+
+    }
+    catch (err) {
+      logger?.error('Get Sessions By UserID: ERROR', { err })
+      return null
+    }
   }
 }

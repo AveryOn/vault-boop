@@ -8,6 +8,9 @@ export type SessionInput = typeof sessionTable.$inferInsert
 export const createSessionDto = z.object({
   lastUserActionId: z.uuid(),
   userId: z.uuid(),
+  ip: z.ipv4(),
+  deviceId: z.uuid(),
+  ua: z.string()
 })
 export type CreateSessionDto = z.infer<typeof createSessionDto>
 export type CreateSessionResponse = Session

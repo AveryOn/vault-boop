@@ -43,6 +43,8 @@ export const AuthService = {
             createdAt: now,
             deletedAt: null,
           }
+
+          logger?.error('[1]:: user_not_found')
         }
         // ---
 
@@ -68,9 +70,12 @@ export const AuthService = {
             lastUserActionId: mockUUID,
             createdAt: now,
           }
+          logger?.error('[2]:: session_not_found')
+
         }
         if (isEntityExpired(session.expiresAt)) {
           ErrorMap.sessionId.push('session_expired')
+          logger?.error('[2]:: session_expired')
         }
         // ---
 
@@ -91,10 +96,23 @@ export const AuthService = {
             token: 'token_hash',
             userId: mockUUID,
           }
+          logger?.error('[3]:: access_token_not_found')
         }
         // ---
 
         // 4. Проверка device ID
+        if (session.deviceId !== locals.deviceId) {
+          ErrorMap.deviceId.push('invalid_device_id')
+          logger?.error('[4]:: invalid_device_id')
+        }
+        // ---
+
+        // 5. Проверка User-Agent
+        if (session.ua !== locals.ua) {
+          ErrorMap.ua.push('invalid_user_agent')
+          logger?.error('[5]:: invalid_user_agent')
+        }
+
 
 
 

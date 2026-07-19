@@ -17,6 +17,9 @@ export const SessionRepo = {
       .values({
         accessTokenId: null,
         createdAt: now,
+        deviceId: dto.deviceId,
+        ip: dto.ip,
+        ua: dto.ua,
         expiresAt: getExpiresAt(env.SESSION_TTL, new Date(now)),
         lastUsedAt: now,
         lastUserActionId: dto.lastUserActionId,
@@ -28,34 +31,15 @@ export const SessionRepo = {
     return session
   },
 
-  async getList(tx?: DatabaseTransaction): Promise<Session[]> {
-    const db = SelectDatabaseAdapter(database, tx)
-    return await db
-      .select()
-      .from(sessionTable)
-  },
-
-  async getById(sessionId: string, tx?: DatabaseTransaction): Promise<Session | null> {
-    const db = SelectDatabaseAdapter(database, tx)
-    const [session] = await db
-      .select()
-      .from(sessionTable)
-      .where(
-        eq(sessionTable.id, sessionId),
-      )
-
-    return session ?? null
-  },
-
   async getByUserId(userId: string, tx?: DatabaseTransaction): Promise<Session[]> {
     const db = SelectDatabaseAdapter(database, tx)
-    const session = await db
+    const sessions = await db
       .select()
       .from(sessionTable)
       .where(
         eq(sessionTable.userId, userId),
       )
-    return session
+    return sessions
   },
 
   async getByStatus(dto: GetSessionByStatus, tx?: DatabaseTransaction): Promise<Session[]> {
