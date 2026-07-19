@@ -11,7 +11,12 @@ export const AccessTokenService = {
     logger?: Logger
   ) {
     try {
-      AccessTokenRepo.
+      const token = AccessTokenRepo.getByParams(params, tx)
+      if (!token) {
+        logger?.error('AccessToken with such params is not found: ERROR')
+        return null
+      }
+      return token
     }
     catch (err) {
       logger?.error('Get AccessToken By Params: ERROR', { err })

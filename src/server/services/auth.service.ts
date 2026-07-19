@@ -5,6 +5,7 @@ import { UserService } from "~/server/services/user.service"
 import { dateISO, getExpiresAt, isEntityExpired } from "~/shared/utils/datetime"
 import { SessionService } from "~/server/services/session.service"
 import { SessionStatus } from "~/shared/const"
+import { AccessTokenService } from "./access-token.service"
 
 export const AuthService = {
 
@@ -68,7 +69,26 @@ export const AuthService = {
         }
         // ---
 
-        // 3.
+        // 3. Проверка AccessToken
+        let token = await AccessTokenService.getActiveByUser({
+          sessionId: locals.sessionId!,
+          tokenId: locals.tokenId!,
+          userId: locals.userId!,
+        })
+
+        if (!token) {
+          ErrorMap.tokenId.push('access_token_not_found')
+          token = {
+            archivedAt: null,
+            createdAt: now,
+            id: mockUUID,
+            replacedBy: null,
+            token: 'token_hash',
+            userId: mockUUID,
+          }
+        }
+        // ---
+
 
 
 
