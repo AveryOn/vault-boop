@@ -51,3 +51,16 @@ export function getExpiresAt(ttl: TimeUnitKey, now?: Date) {
     nowDate.getTime() + parseDurationToMs(ttl),
   ).toISOString()
 }
+
+export function isEntityExpired(
+  expiresAt: string,
+  now: Date = new Date(),
+): boolean {
+  const expiresAtMs = Date.parse(expiresAt)
+
+  if (Number.isNaN(expiresAtMs)) {
+    throw new Error(`Invalid expiresAt: ${expiresAt}`)
+  }
+
+  return now.getTime() >= expiresAtMs
+}

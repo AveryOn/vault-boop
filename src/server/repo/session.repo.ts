@@ -1,4 +1,4 @@
-import type { CreateSessionDto, GetSessionByStatus, Session, TerminateAllSessionsDto } from "~/shared/dto/session.dto";
+import type { CreateSessionDto, GetSessionByParams, GetSessionByStatus, Session, TerminateAllSessionsDto } from "~/shared/dto/session.dto";
 import { db as database, type DatabaseTransaction } from "~/server/database/client";
 import { sessionTable } from "../database/schema";
 import { and, eq } from "drizzle-orm";
@@ -79,6 +79,20 @@ export const SessionRepo = {
       .from(sessionTable)
       .where(
         eq(sessionTable.accessTokenId, accessTokenId),
+      )
+    return session ?? null
+  },
+
+  async getByTokenAndUser(params: GetSessionByParams, tx?: DatabaseTransaction): Promise<Session | null> {
+    const db = SelectDatabaseAdapter(database, tx)
+    const [session] = await db
+      .select()
+      .from(sessionTable)
+      .where(
+        and(
+          eq(sessionTable.accessTokenId, params.accessTokenId),
+          eq(sessionTable.userId, params.userId),
+        )
       )
     return session ?? null
   },
