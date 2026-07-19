@@ -112,40 +112,49 @@ export const AuthService = {
           ErrorMap.ua.push('invalid_user_agent')
           logger?.error('[5]:: invalid_user_agent')
         }
+        // ---
 
+        // 6. Проверка IP адреса
+        if (session.ip !== locals.ip) {
+          ErrorMap.ip.push('invalid_ip')
+          logger?.error('[6]:: invalid_ip')
+        }
 
-
-
+        if (Object.values(ErrorMap).some(v => v.length > 0)) {
+          logger?.error('ERROR', { ErrorMap })
+          return false
+        }
+        return true
       }
       catch (err) {
         logger?.error('Sign-Up Error', { err })
-        throw err
+        return false
       }
 
     })
   },
 
-  async signUp(dto: SignUpDto, logger: Logger) {
-    return await db.transaction(async (tx) => {
-      try {
-        //
-      }
-      catch (err) {
-        logger.error('Sign-Up Error', { err })
-        throw err
-      }
+  // async signUp(dto: SignUpDto, logger: Logger) {
+  //   return await db.transaction(async (tx) => {
+  //     try {
+  //       //
+  //     }
+  //     catch (err) {
+  //       logger.error('Sign-Up Error', { err })
+  //       throw err
+  //     }
 
-    })
-  },
+  //   })
+  // },
 
-  async signIn(dto: SignInDto, logger: Logger) {
-    return await db.transaction(async (tx) => {
-      try {
-        //
-      } catch (err) {
-        logger.error('Sign-In Error', { err })
-        throw err
-      }
-    })
-  }
+  // async signIn(dto: SignInDto, logger: Logger) {
+  //   return await db.transaction(async (tx) => {
+  //     try {
+  //       //
+  //     } catch (err) {
+  //       logger.error('Sign-In Error', { err })
+  //       throw err
+  //     }
+  //   })
+  // }
 }
