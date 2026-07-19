@@ -123,6 +123,12 @@ async function validationContext(locals: App.Locals, logger: Logger): Promise<bo
   }, logger)
   logger.error('Validation Context Error', { error: result.error })
   return success
+}
+
+/**
+ * Сбрасывает куки безопасности
+ */
+function resetSecureCookies() {
 
 }
 
@@ -177,6 +183,9 @@ export const AuthCheckMiddleware = defineMiddleware(
     // Пользователь не авторизован
     if (!isUserAuthorized) {
       logger.info('User Is Not Authorized')
+
+      // Сбрасываем куки
+      resetSecureCookies()
     }
 
     // Пользователь Авторизован
