@@ -5,6 +5,7 @@ import { decryptData } from '~/server/utils/crypto'
 import type { AccessTokenPayload } from '~/shared/dto/access-token.dto'
 import type { APIContext } from 'astro'
 import z from 'zod'
+import { AuthService } from '../services/auth.service'
 
 // function rejectUnauthorized(ctx: MiddlewareCtx): Response {
 //   const pathname = normalizePath(new URL(ctx.request.url).pathname)
@@ -91,7 +92,7 @@ const BodyContextDto = z.object({
 })
 
 /** Валидация контекста запроса */
-function validationContext(locals: App.Locals, logger: Logger) {
+async function validationContext(locals: App.Locals, logger: Logger): Promise<boolean> {
   logger.info('[STAGE_7]:: Validation App.Locals Context')
 
   const result = BodyContextDto.safeParse(locals)
@@ -106,13 +107,23 @@ function validationContext(locals: App.Locals, logger: Logger) {
     tokenId: crypto.randomUUID(),
     username: 'mock_user_123',
   }
+  logger.info('Validation Auth Context', { data })
 
   if (result.success) {
     data = result.data
+
+    const success = await AuthService.validateAuthContext({
+      ua: data.ua!,
+      ip: data.ip!,
+      deviceId: data.deviceId!,
+      userId: data.userId!,
+      sessionId: data.sessionId!,
+      tokenId: data.tokenId!,
+      username: data.username!,
+    })
+    return success
   }
-
-
-
+  return false
 
 }
 
@@ -157,8 +168,15 @@ export const AuthCheckMiddleware = defineMiddleware(
     })
 
     // Валидация контекста запроса
+    const isUserAuthorized = await validationContext(LocalContext, logger)
 
-
+    // Если пользователь не авторизован
+    if (!isUserAuthorized) {
+      logger.info('User Is Not Authorized')
+    }
+    else {
+      logger.info('User Is Authorized')
+    }
 
 
     logger.info('Excludes require data from Request', {
