@@ -19,6 +19,8 @@ export const AuthService = {
       username: [],
     }
 
+    logger?.info('ASDASFAFSAFASASFAAFS')
+
     return await db.transaction(async (tx) => {
       try {
         const now = dateISO()

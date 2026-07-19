@@ -111,19 +111,18 @@ async function validationContext(locals: App.Locals, logger: Logger): Promise<bo
 
   if (result.success) {
     data = result.data
-
-    const success = await AuthService.validateAuthContext({
-      ua: data.ua!,
-      ip: data.ip!,
-      deviceId: data.deviceId!,
-      userId: data.userId!,
-      sessionId: data.sessionId!,
-      tokenId: data.tokenId!,
-      username: data.username!,
-    })
-    return success
   }
-  return false
+  const success = await AuthService.validateAuthContext({
+    ua: data.ua!,
+    ip: data.ip!,
+    deviceId: data.deviceId!,
+    userId: data.userId!,
+    sessionId: data.sessionId!,
+    tokenId: data.tokenId!,
+    username: data.username!,
+  }, logger)
+  logger.error('Validation Context Error', { error: result.error })
+  return success
 
 }
 
