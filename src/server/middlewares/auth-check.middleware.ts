@@ -174,16 +174,15 @@ export const AuthCheckMiddleware = defineMiddleware(
     // Валидация контекста запроса
     const isUserAuthorized = await validationContext(LocalContext, logger)
 
-    // Если пользователь не авторизован
+    // Пользователь не авторизован
     if (!isUserAuthorized) {
       logger.info('User Is Not Authorized')
     }
+
+    // Пользователь Авторизован
     else {
       logger.info('User Is Authorized')
     }
-
-
-
 
     return next()
   },
