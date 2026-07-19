@@ -34,3 +34,10 @@ export const getSessionByStatus = z.object({
   status: z.enum(SessionStatus),
 })
 export type GetSessionByStatus = z.infer<typeof getSessionByStatus>
+
+export const getSessionByParams = z.object({
+  userId: z.uuid(),
+  accessTokenId: z.uuid(),
+})
+
+export type GetSessionByParams = z.infer<typeof getSessionByParams>
