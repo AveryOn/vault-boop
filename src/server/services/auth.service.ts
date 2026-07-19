@@ -41,12 +41,15 @@ export const AuthService = {
             deletedAt: null,
           }
         }
+        // ---
+
 
         // 2. Проверить сессию
         let session = await SessionService.getByParams({
           accessTokenId: locals.tokenId!,
           userId: locals.userId!,
-        })
+        }, tx, logger)
+
         if (!session) {
           ErrorMap.sessionId.push('session_not_found')
           session = {
@@ -60,10 +63,12 @@ export const AuthService = {
             createdAt: now,
           }
         }
-
         if (isEntityExpired(session.expiresAt)) {
           ErrorMap.sessionId.push('session_expired')
         }
+        // ---
+
+        // 3.
 
 
 

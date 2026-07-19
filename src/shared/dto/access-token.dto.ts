@@ -23,3 +23,13 @@ export interface AccessTokenPayload {
   ua: string
   ip: string
 }
+
+
+export const getTokenActiveByUser = z.object({
+  userId: z.uuid(),
+  tokenId: z.uuid(),
+  sessionId: z.uuid(),
+})
+
+
+export type GetTokenActiveByUser = z.infer<typeof getTokenActiveByUser>

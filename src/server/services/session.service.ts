@@ -16,14 +16,14 @@ export const SessionService = {
     try {
       const session = await SessionRepo.getByTokenAndUser(params, tx)
       if (!session) {
-        logger?.error('User with such username is not found', { status: HttpStatusCode.NotFound })
+        logger?.error('Session with such params is not found', { status: HttpStatusCode.NotFound })
         return null
       }
 
       return session ?? null
     }
     catch (err) {
-      logger?.error('Get User By Username: ERROR', { err })
+      logger?.error('Get Session By Params: ERROR', { err })
       return null
     }
   }

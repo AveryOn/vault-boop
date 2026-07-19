@@ -11,6 +11,8 @@ export const accessTokenTable = sqliteTable('access_token', {
     .notNull()
     .references(() => userTable.id, { onDelete: 'cascade' }),
 
+  replacedBy: text('replaced_by'),
+
   createdAt: timestamp('created_at', true).notNull(),
   archivedAt: timestamp('archived_at', true),
 })
