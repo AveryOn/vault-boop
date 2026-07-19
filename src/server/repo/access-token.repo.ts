@@ -1,10 +1,11 @@
 import { db, type DatabaseTransaction } from "~/server/database/client";
-import { accessTokenTable } from "~/server/database/schema";
+import { accessTokenTable, sessionTable } from "~/server/database/schema";
 import { and, eq } from "drizzle-orm";
 import { dateISO } from "~/shared/utils/datetime";
 import type { AccessToken, AccessTokenPayload, CreateAccessTokenDto, CreateAccessTokenSecureDto, GetTokenActiveByUser } from "~/shared/dto/access-token.dto";
 import { decryptData, encryptData } from "~/server/utils/crypto";
 import { SelectDatabaseAdapter } from "../database/helpers";
+import { SessionStatus } from "~/shared/const";
 
 
 export const AccessTokenRepo = {
@@ -28,17 +29,27 @@ export const AccessTokenRepo = {
   async getByParams(params: GetTokenActiveByUser, tx?: DatabaseTransaction): Promise<AccessToken | null> {
     const database = SelectDatabaseAdapter(db, tx)
 
-    const [accessToken] = await database
-      .select()
+    const [{ token }] = await database
+      .select({
+        token: accessTokenTable,
+      })
       .from(accessTokenTable)
+      .innerJoin(
+        sessionTable,
+        and(
+          eq(sessionTable.accessTokenId, accessTokenTable.id),
+          eq(sessionTable.status, SessionStatus.ACTIVE),
+        )
+      )
       .where(
         and(
           eq(accessTokenTable.id, params.tokenId),
           eq(accessTokenTable.userId, params.userId),
+          eq(sessionTable.userId, params.userId),
         )
       )
 
-    return accessToken ?? null
+    return token ?? null
   },
 
   async create(
