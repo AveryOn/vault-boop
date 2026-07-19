@@ -24,6 +24,8 @@ export const AuthService = {
       try {
         const now = dateISO()
         const mockUUID = crypto.randomUUID()
+        const ip = '127.0.0.1'
+        const ua = 'MOCK_USER-AGENT'
 
         // 1. Проверить существование пользователя
         let user = await UserService.getByUsername(locals.username!, tx, logger)
@@ -59,7 +61,10 @@ export const AuthService = {
             userId: mockUUID,
             accessTokenId: mockUUID,
             expiresAt: getExpiresAt('15m'),
+            deviceId: mockUUID,
             lastUsedAt: now,
+            ip: ip,
+            ua: ua,
             lastUserActionId: mockUUID,
             createdAt: now,
           }
@@ -89,6 +94,7 @@ export const AuthService = {
         }
         // ---
 
+        // 4. Проверка device ID
 
 
 

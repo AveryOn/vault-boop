@@ -19,6 +19,8 @@ export const sessionTable = sqliteTable('session', {
     .references(() => userActionTable.id, { onDelete: 'no action' }),
 
   deviceId: text('device_id').notNull(),
+  ip: text('ip').notNull(),
+  ua: text('ua').notNull(),
 
   status: text('status').default('ACTIVE'),
   expiresAt: timestamp('expires_at').notNull(),
