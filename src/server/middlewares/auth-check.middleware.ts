@@ -190,7 +190,7 @@ export const AuthCheckMiddleware = defineMiddleware(
 
     // Пользователь Авторизован
     else {
-      logger.info('User Is Authorized')
+      logger.info('User Is Authorized');
     }
 
     return next()
