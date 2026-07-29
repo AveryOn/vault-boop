@@ -1,5 +1,5 @@
 import crypto, { type CipherGCMTypes } from 'node:crypto'
-import { serverEnv as env } from "~/server/config/env"
+import { serverEnv as env } from '~/server/config/env'
 import argon2 from 'argon2'
 
 function getDataKey(): Buffer {
@@ -9,10 +9,7 @@ function getDataKey(): Buffer {
     throw new Error('DATA_HASH_KEY is not configured')
   }
 
-  return crypto
-    .createHash('sha256')
-    .update(secret)
-    .digest()
+  return crypto.createHash('sha256').update(secret).digest()
 }
 
 function getAccessKey(): Buffer {
@@ -22,10 +19,7 @@ function getAccessKey(): Buffer {
     throw new Error('ACCESS_HASH_KEY is not configured')
   }
 
-  return crypto
-    .createHash('sha256')
-    .update(secret)
-    .digest()
+  return crypto.createHash('sha256').update(secret).digest()
 }
 
 const getKeyMap = {
@@ -34,15 +28,17 @@ const getKeyMap = {
 } as const
 type GetKeyType = keyof typeof getKeyMap
 
-
-export async function encryptData(value: string, type: GetKeyType): Promise<string> {
+export async function encryptData(
+  value: string,
+  type: GetKeyType,
+): Promise<string> {
   return await new Promise((resolve, reject) => {
     try {
       const iv = crypto.randomBytes(12)
       const cipher = crypto.createCipheriv(
         env.CIPHER_ALGORITHM as CipherGCMTypes,
         getKeyMap[type](),
-        iv
+        iv,
       )
 
       const encrypted = Buffer.concat([
@@ -57,7 +53,7 @@ export async function encryptData(value: string, type: GetKeyType): Promise<stri
           iv.toString('base64'),
           authTag.toString('base64'),
           encrypted.toString('base64'),
-        ].join(':')
+        ].join(':'),
       )
     } catch (err) {
       console.error(err)
@@ -66,7 +62,10 @@ export async function encryptData(value: string, type: GetKeyType): Promise<stri
   })
 }
 
-export async function decryptData(value: string, type: GetKeyType): Promise<string> {
+export async function decryptData(
+  value: string,
+  type: GetKeyType,
+): Promise<string> {
   return await new Promise((resolve, reject) => {
     try {
       const [ivBase64, authTagBase64, encryptedBase64] = value.split(':')
@@ -83,11 +82,10 @@ export async function decryptData(value: string, type: GetKeyType): Promise<stri
 
       decipher.setAuthTag(Buffer.from(authTagBase64, 'base64'))
 
-      const decrypted = Buffer
-        .concat([
-          decipher.update(Buffer.from(encryptedBase64, 'base64')),
-          decipher.final(),
-        ])
+      const decrypted = Buffer.concat([
+        decipher.update(Buffer.from(encryptedBase64, 'base64')),
+        decipher.final(),
+      ])
 
       return resolve(decrypted.toString('utf8'))
     } catch (err) {
@@ -95,7 +93,6 @@ export async function decryptData(value: string, type: GetKeyType): Promise<stri
       reject(err)
     }
   })
-
 }
 
 const algorithmMap = {
@@ -104,7 +101,8 @@ const algorithmMap = {
   argon2d: argon2.argon2d,
 } as const
 
-const algorithm = algorithmMap[env.HASH_ALGORITHM as keyof typeof algorithmMap]
+const algorithm =
+  algorithmMap[env.HASH_ALGORITHM as keyof typeof algorithmMap]
 
 export async function hashPassword(password: string): Promise<string> {
   return argon2.hash(password, {

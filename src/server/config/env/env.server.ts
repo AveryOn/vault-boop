@@ -17,8 +17,10 @@ export const serverEnvSchema = z.object({
   HASH_ALGORITHM_PARALLELISM: z.coerce.number(),
 
   SESSION_TTL: z.custom<TimeUnitKey>(
-    value => typeof value === 'string' &&
-      /^(\d+(?:\.\d+)?)(ms|mo|s|m|h|d|w|y)$/.test(value))
+    (value) =>
+      typeof value === 'string' &&
+      /^(\d+(?:\.\d+)?)(ms|mo|s|m|h|d|w|y)$/.test(value),
+  ),
 })
 
 const envSource = {

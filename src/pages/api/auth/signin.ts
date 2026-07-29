@@ -1,7 +1,5 @@
 import type { APIRoute } from 'astro'
-import {
-  Logger,
-} from '~/shared/logger/logger.client'
+import { Logger } from '~/shared/logger/logger.client'
 import { _ } from '~/shared/const'
 import { HttpStatusCode } from 'axios'
 import { throwZodError } from '~/server/plugins/zod.plugin'
@@ -26,17 +24,13 @@ export const POST: APIRoute = async ({ request, locals }) => {
     throw new Error('DATA IS NOT DEFINED')
   }
 
-  console.debug("ASTRO_LOCALS_CONTEXT", {
-    ...locals
+  console.debug('ASTRO_LOCALS_CONTEXT', {
+    ...locals,
   })
   // await AuthUseCase.signIn({
   //   password: data?.password,
   //   username: data?.username,
   // }, logger)
 
-
-  return Response.json(
-    { data: {} },
-    { status: HttpStatusCode.Created },
-  )
+  return Response.json({ data: {} }, { status: HttpStatusCode.Created })
 }

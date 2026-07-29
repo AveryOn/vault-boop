@@ -36,16 +36,21 @@ import { AuthService } from '../services/auth.service'
 // }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-type MiddlewareCtx = APIContext<Record<string, any>, Record<string, string | undefined>>
+type MiddlewareCtx = APIContext<
+  Record<string, any>,
+  Record<string, string | undefined>
+>
 
 function normalizePath(path: string): string {
   return path !== '/' ? path.replace(/\/+$/, '') : path
 }
 
 /** Дешифрование токена доступа. Извлечение payload токена */
-async function excludesTokenPayload(accessToken: string | null): Promise<AccessTokenPayload | null> {
+async function excludesTokenPayload(
+  accessToken: string | null,
+): Promise<AccessTokenPayload | null> {
   try {
-    const token = accessToken ? accessToken : 'stub';
+    const token = accessToken ? accessToken : 'stub'
     return JSON.parse(await decryptData(token, 'access'))
   } catch {
     return null
@@ -57,10 +62,12 @@ function excludesUserAgent(ctx: MiddlewareCtx): string | null {
 }
 
 function excludesIP(ctx: MiddlewareCtx): string | null {
-  return ctx.request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
-    ?? ctx.request.headers.get('x-real-ip')
-    ?? ctx.clientAddress
-    ?? null
+  return (
+    ctx.request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ??
+    ctx.request.headers.get('x-real-ip') ??
+    ctx.clientAddress ??
+    null
+  )
 }
 
 function excludesAccessToken(ctx: MiddlewareCtx): string | null {
@@ -71,7 +78,10 @@ function excludesDeviceId(ctx: MiddlewareCtx): string | null {
   return ctx.cookies.get(CookieName['deviceId'])?.value ?? null
 }
 
-function fillLocalsContext(ctx: MiddlewareCtx, locals: App.Locals): App.Locals {
+function fillLocalsContext(
+  ctx: MiddlewareCtx,
+  locals: App.Locals,
+): App.Locals {
   for (const key in locals) {
     const k = key as keyof App.Locals
     if (Object.prototype.hasOwnProperty.call(locals, k)) {
@@ -92,7 +102,10 @@ const BodyContextDto = z.object({
 })
 
 /** Валидация контекста запроса */
-async function validationContext(locals: App.Locals, logger: Logger): Promise<boolean> {
+async function validationContext(
+  locals: App.Locals,
+  logger: Logger,
+): Promise<boolean> {
   logger.info('[STAGE_7]:: Validation App.Locals Context')
 
   const result = BodyContextDto.safeParse(locals)
@@ -112,15 +125,18 @@ async function validationContext(locals: App.Locals, logger: Logger): Promise<bo
   if (result.success) {
     data = result.data
   }
-  const success = await AuthService.validateAuthContext({
-    ua: data.ua!,
-    ip: data.ip!,
-    deviceId: data.deviceId!,
-    userId: data.userId!,
-    sessionId: data.sessionId!,
-    tokenId: data.tokenId!,
-    username: data.username!,
-  }, logger)
+  const success = await AuthService.validateAuthContext(
+    {
+      ua: data.ua!,
+      ip: data.ip!,
+      deviceId: data.deviceId!,
+      userId: data.userId!,
+      sessionId: data.sessionId!,
+      tokenId: data.tokenId!,
+      username: data.username!,
+    },
+    logger,
+  )
   logger.error('Validation Context Error', { error: result.error })
   return success
 }
@@ -128,9 +144,7 @@ async function validationContext(locals: App.Locals, logger: Logger): Promise<bo
 /**
  * Сбрасывает куки безопасности
  */
-function resetSecureCookies() {
-
-}
+function resetSecureCookies() {}
 
 export const AuthCheckMiddleware = defineMiddleware(
   async (ctx, next) => {
@@ -160,7 +174,6 @@ export const AuthCheckMiddleware = defineMiddleware(
     logger.info('[STAGE_6]:: Exclude the token payload from accessToken')
     const TokenPayload = await excludesTokenPayload(accessToken)
 
-
     // Заполняем App.Locals контекст все необходимые данные в один объект
     const LocalContext = fillLocalsContext(ctx, {
       ua,
@@ -178,7 +191,10 @@ export const AuthCheckMiddleware = defineMiddleware(
     })
 
     // Валидация контекста запроса
-    const isUserAuthorized = await validationContext(LocalContext, logger)
+    const isUserAuthorized = await validationContext(
+      LocalContext,
+      logger,
+    )
 
     // Пользователь не авторизован
     if (!isUserAuthorized) {
@@ -190,7 +206,7 @@ export const AuthCheckMiddleware = defineMiddleware(
 
     // Пользователь Авторизован
     else {
-      logger.info('User Is Authorized');
+      logger.info('User Is Authorized')
     }
 
     return next()

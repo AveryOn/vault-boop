@@ -1,10 +1,13 @@
-
 import { userActionTable } from '~/server/database/schema'
 import { db, type DatabaseTransaction } from '~/server/database/client'
 import { dateISO } from '~/shared/utils/datetime'
-import { eq } from 'drizzle-orm';
-import type { CreateUserActionDto, CreateUserActionSecureDto, UserActionSafety } from '~/shared/dto/user-action.dto';
-import { SelectDatabaseAdapter } from '~/server/database/helpers';
+import { eq } from 'drizzle-orm'
+import type {
+  CreateUserActionDto,
+  CreateUserActionSecureDto,
+  UserActionSafety,
+} from '~/shared/dto/user-action.dto'
+import { SelectDatabaseAdapter } from '~/server/database/helpers'
 
 export const UserActionRepo = {
   async getList(tx?: DatabaseTransaction): Promise<UserActionSafety[]> {
@@ -19,7 +22,10 @@ export const UserActionRepo = {
       .from(userActionTable)
   },
 
-  async getById(userActionId: string, tx?: DatabaseTransaction): Promise<UserActionSafety | null> {
+  async getById(
+    userActionId: string,
+    tx?: DatabaseTransaction,
+  ): Promise<UserActionSafety | null> {
     const database = SelectDatabaseAdapter(db, tx)
     const [userAction] = await database
       .select({
@@ -29,9 +35,7 @@ export const UserActionRepo = {
         comment: userActionTable.comment,
       })
       .from(userActionTable)
-      .where(
-        eq(userActionTable.id, userActionId)
-      )
+      .where(eq(userActionTable.id, userActionId))
     return userAction ?? null
   },
 

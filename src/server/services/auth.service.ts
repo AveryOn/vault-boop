@@ -1,14 +1,20 @@
-import type { Logger } from "~/shared/logger/logger.client"
-import { db } from "~/server/database/client"
-import { UserService } from "~/server/services/user.service"
-import { dateISO, getExpiresAt, isEntityExpired } from "~/shared/utils/datetime"
-import { SessionService } from "~/server/services/session.service"
-import { SessionStatus } from "~/shared/const"
-import { AccessTokenService } from "./access-token.service"
+import type { Logger } from '~/shared/logger/logger.client'
+import { db } from '~/server/database/client'
+import { UserService } from '~/server/services/user.service'
+import {
+  dateISO,
+  getExpiresAt,
+  isEntityExpired,
+} from '~/shared/utils/datetime'
+import { SessionService } from '~/server/services/session.service'
+import { SessionStatus } from '~/shared/const'
+import { AccessTokenService } from './access-token.service'
 
 export const AuthService = {
-
-  async validateAuthContext(locals: Required<App.Locals>, logger?: Logger) {
+  async validateAuthContext(
+    locals: Required<App.Locals>,
+    logger?: Logger,
+  ) {
     const ErrorMap: Record<keyof Required<App.Locals>, string[]> = {
       ip: [],
       ua: [],
@@ -27,7 +33,11 @@ export const AuthService = {
         const ua = 'MOCK_USER-AGENT'
 
         // 1. Проверить существование пользователя
-        let user = await UserService.getByUsername(locals.username!, tx, logger)
+        let user = await UserService.getByUsername(
+          locals.username!,
+          tx,
+          logger,
+        )
         if (!user) {
           ErrorMap.username.push('user_not_found')
 
@@ -47,12 +57,15 @@ export const AuthService = {
         }
         // ---
 
-
         // 2. Проверить сессию
-        let session = await SessionService.getByParams({
-          accessTokenId: locals.tokenId!,
-          userId: locals.userId!,
-        }, tx, logger)
+        let session = await SessionService.getByParams(
+          {
+            accessTokenId: locals.tokenId!,
+            userId: locals.userId!,
+          },
+          tx,
+          logger,
+        )
 
         if (!session) {
           ErrorMap.sessionId.push('session_not_found')
@@ -70,7 +83,6 @@ export const AuthService = {
             createdAt: now,
           }
           logger?.error('[2]:: session_not_found')
-
         }
         if (isEntityExpired(session.expiresAt)) {
           ErrorMap.sessionId.push('session_expired')
@@ -120,17 +132,15 @@ export const AuthService = {
         }
 
         // Если за время выполнения функции была хотя бы одно ошибка
-        if (Object.values(ErrorMap).some(v => v.length > 0)) {
+        if (Object.values(ErrorMap).some((v) => v.length > 0)) {
           logger?.error('ERROR', { ErrorMap })
           return false
         }
         return true
-      }
-      catch {
+      } catch {
         logger?.error('validateAuthContext:: ERROR')
         return false
       }
-
     })
   },
 

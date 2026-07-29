@@ -1,11 +1,21 @@
 import { userTable } from '~/server/database/schema'
-import { db as database, type DatabaseTransaction } from '~/server/database/client'
-import type { CreateUserDto, CreateUserResponse, UpdateUserDto, UpdateUserResponse, User, UserSafety } from '~/shared/dto/user.dto'
+import {
+  db as database,
+  type DatabaseTransaction,
+} from '~/server/database/client'
+import type {
+  CreateUserDto,
+  CreateUserResponse,
+  UpdateUserDto,
+  UpdateUserResponse,
+  User,
+  UserSafety,
+} from '~/shared/dto/user.dto'
 import { dateISO } from '~/shared/utils/datetime'
-import { serverEnv as env } from '~/server/config/env/env.server';
-import { eq } from 'drizzle-orm';
-import { SelectDatabaseAdapter } from '~/server/database/helpers';
-import { _ } from '~/shared/const';
+import { serverEnv as env } from '~/server/config/env/env.server'
+import { eq } from 'drizzle-orm'
+import { SelectDatabaseAdapter } from '~/server/database/helpers'
+import { _ } from '~/shared/const'
 
 export const UserRepo = {
   async getList(tx?: DatabaseTransaction): Promise<UserSafety[]> {
@@ -33,15 +43,13 @@ export const UserRepo = {
         deletedAt: userTable.deletedAt,
       })
       .from(userTable)
-      .where(
-        eq(userTable.id, userId)
-      )
+      .where(eq(userTable.id, userId))
     return user
   },
 
   async getByUsername(
     username: string,
-    tx?: DatabaseTransaction
+    tx?: DatabaseTransaction,
   ): Promise<User | null> {
     const db = SelectDatabaseAdapter(database, tx)
     const [user] = await db
@@ -56,14 +64,14 @@ export const UserRepo = {
         deletedAt: userTable.deletedAt,
       })
       .from(userTable)
-      .where(
-        eq(userTable.username, username)
-      )
+      .where(eq(userTable.username, username))
     return user ?? null
   },
 
-
-  async create(data: CreateUserDto, tx?: DatabaseTransaction): Promise<CreateUserResponse> {
+  async create(
+    data: CreateUserDto,
+    tx?: DatabaseTransaction,
+  ): Promise<CreateUserResponse> {
     const db = SelectDatabaseAdapter(database, tx)
     const now = dateISO()
     const [user] = await db
@@ -91,7 +99,11 @@ export const UserRepo = {
     return user
   },
 
-  async update(userId: string, data: UpdateUserDto, tx?: DatabaseTransaction): Promise<UpdateUserResponse> {
+  async update(
+    userId: string,
+    data: UpdateUserDto,
+    tx?: DatabaseTransaction,
+  ): Promise<UpdateUserResponse> {
     const db = SelectDatabaseAdapter(database, tx)
     const now = dateISO()
     const [user] = await db
@@ -101,7 +113,8 @@ export const UserRepo = {
         lastName: data.lastName,
         username: data.username,
         //  TODO ПОСТАВИТЬ РЕАЛЬНУЮ ЗАЩИТУ
-        masterPasswordHash: data.password && data.password + env.DATA_HASH_KEY, //  TODO ПОСТАВИТЬ РЕАЛЬНУЮ ЗАЩИТУ
+        masterPasswordHash:
+          data.password && data.password + env.DATA_HASH_KEY, //  TODO ПОСТАВИТЬ РЕАЛЬНУЮ ЗАЩИТУ
         updatedAt: now,
       })
       .where(eq(userTable.id, userId))
@@ -116,7 +129,10 @@ export const UserRepo = {
     return user
   },
 
-  async delete(userId: string, tx?: DatabaseTransaction): Promise<boolean> {
+  async delete(
+    userId: string,
+    tx?: DatabaseTransaction,
+  ): Promise<boolean> {
     try {
       const db = SelectDatabaseAdapter(database, tx)
       const now = dateISO()
@@ -125,14 +141,11 @@ export const UserRepo = {
         .set({
           deletedAt: now,
         })
-        .where(
-          eq(userTable.id, userId),
-        )
+        .where(eq(userTable.id, userId))
       return true
-    }
-    catch (err) {
+    } catch (err) {
       console.error(err)
       return false
     }
-  }
+  },
 }

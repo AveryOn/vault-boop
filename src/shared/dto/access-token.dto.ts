@@ -8,11 +8,12 @@ export const createAccessTokenDto = z.object({
   token: z.string(),
 })
 export type CreateAccessTokenDto = z.infer<typeof createAccessTokenDto>
-export type CreateAccessTokenResponse = Omit<AccessToken, 'token' | 'userId'>
-
+export type CreateAccessTokenResponse = Omit<
+  AccessToken,
+  'token' | 'userId'
+>
 
 export type CreateAccessTokenSecureDto = Pick<AccessTokenInput, 'userId'>
-
 
 export interface AccessTokenPayload {
   userId: string
@@ -24,12 +25,10 @@ export interface AccessTokenPayload {
   ip: string
 }
 
-
 export const getTokenActiveByUser = z.object({
   userId: z.uuid(),
   tokenId: z.uuid(),
   sessionId: z.uuid(),
 })
-
 
 export type GetTokenActiveByUser = z.infer<typeof getTokenActiveByUser>

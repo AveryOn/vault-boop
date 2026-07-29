@@ -1,8 +1,10 @@
-import { parseDurationToMs, type TimeUnit } from "~/shared/utils/datetime"
+import {
+  parseDurationToMs,
+  type TimeUnit,
+} from '~/shared/utils/datetime'
 
 export type SleepDuration = `${number}${TimeUnit}`
 const MAX_TIMEOUT_MS = 2_147_483_647
-
 
 export async function sleep(
   duration: SleepDuration | number,

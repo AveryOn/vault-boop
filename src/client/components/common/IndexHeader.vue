@@ -7,7 +7,6 @@ import Icon from '~/client/components/common/Icon.vue'
 
 const appStore = useAppStore()
 
-
 onMounted(() => {
   appStore.initTheme()
 })

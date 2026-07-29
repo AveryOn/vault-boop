@@ -4,5 +4,5 @@ import { BaseCheckUpMiddleware } from '~/server/middlewares/base-checkup.middlew
 
 export const onRequest = sequence(
   BaseCheckUpMiddleware,
-  AuthCheckMiddleware
+  AuthCheckMiddleware,
 )

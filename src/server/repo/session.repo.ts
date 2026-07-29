@@ -1,15 +1,26 @@
-import type { CreateSessionDto, GetSessionByParams, GetSessionByStatus, Session, TerminateAllSessionsDto } from "~/shared/dto/session.dto";
-import { db as database, type DatabaseTransaction } from "~/server/database/client";
-import { sessionTable } from "../database/schema";
-import { and, eq } from "drizzle-orm";
-import { SessionStatus } from "~/shared/const";
-import { dateISO, getExpiresAt } from "~/shared/utils/datetime";
-import { serverEnv as env } from "~/server/config/env";
-import { SelectDatabaseAdapter } from "~/server/database/helpers";
-
+import type {
+  CreateSessionDto,
+  GetSessionByParams,
+  GetSessionByStatus,
+  Session,
+  TerminateAllSessionsDto,
+} from '~/shared/dto/session.dto'
+import {
+  db as database,
+  type DatabaseTransaction,
+} from '~/server/database/client'
+import { sessionTable } from '../database/schema'
+import { and, eq } from 'drizzle-orm'
+import { SessionStatus } from '~/shared/const'
+import { dateISO, getExpiresAt } from '~/shared/utils/datetime'
+import { serverEnv as env } from '~/server/config/env'
+import { SelectDatabaseAdapter } from '~/server/database/helpers'
 
 export const SessionRepo = {
-  async create(dto: CreateSessionDto, tx?: DatabaseTransaction): Promise<Session> {
+  async create(
+    dto: CreateSessionDto,
+    tx?: DatabaseTransaction,
+  ): Promise<Session> {
     const db = SelectDatabaseAdapter(database, tx)
     const now = dateISO()
     const [session] = await db
@@ -31,18 +42,22 @@ export const SessionRepo = {
     return session
   },
 
-  async getByUserId(userId: string, tx?: DatabaseTransaction): Promise<Session[]> {
+  async getByUserId(
+    userId: string,
+    tx?: DatabaseTransaction,
+  ): Promise<Session[]> {
     const db = SelectDatabaseAdapter(database, tx)
     const sessions = await db
       .select()
       .from(sessionTable)
-      .where(
-        eq(sessionTable.userId, userId),
-      )
+      .where(eq(sessionTable.userId, userId))
     return sessions
   },
 
-  async getByStatus(dto: GetSessionByStatus, tx?: DatabaseTransaction): Promise<Session[]> {
+  async getByStatus(
+    dto: GetSessionByStatus,
+    tx?: DatabaseTransaction,
+  ): Promise<Session[]> {
     const db = SelectDatabaseAdapter(database, tx)
     const sessions = await db
       .select()
@@ -51,23 +66,27 @@ export const SessionRepo = {
         and(
           eq(sessionTable.userId, dto.userId),
           eq(sessionTable.status, dto.status),
-        )
+        ),
       )
     return sessions
   },
 
-  async getByAccessTokenId(accessTokenId: string, tx?: DatabaseTransaction): Promise<Session | null> {
+  async getByAccessTokenId(
+    accessTokenId: string,
+    tx?: DatabaseTransaction,
+  ): Promise<Session | null> {
     const db = SelectDatabaseAdapter(database, tx)
     const [session] = await db
       .select()
       .from(sessionTable)
-      .where(
-        eq(sessionTable.accessTokenId, accessTokenId),
-      )
+      .where(eq(sessionTable.accessTokenId, accessTokenId))
     return session ?? null
   },
 
-  async getByTokenAndUser(params: GetSessionByParams, tx?: DatabaseTransaction): Promise<Session | null> {
+  async getByTokenAndUser(
+    params: GetSessionByParams,
+    tx?: DatabaseTransaction,
+  ): Promise<Session | null> {
     const db = SelectDatabaseAdapter(database, tx)
     const [session] = await db
       .select()
@@ -76,13 +95,16 @@ export const SessionRepo = {
         and(
           eq(sessionTable.accessTokenId, params.accessTokenId),
           eq(sessionTable.userId, params.userId),
-        )
+        ),
       )
     return session ?? null
   },
 
   /** Принудительное завершение всех сессий для пользователя */
-  async terminateAll(dto: TerminateAllSessionsDto, tx?: DatabaseTransaction): Promise<boolean> {
+  async terminateAll(
+    dto: TerminateAllSessionsDto,
+    tx?: DatabaseTransaction,
+  ): Promise<boolean> {
     try {
       const db = SelectDatabaseAdapter(database, tx)
       await db
@@ -90,18 +112,18 @@ export const SessionRepo = {
         .set({
           status: SessionStatus.TERMINATED,
         })
-        .where(
-          eq(sessionTable.userId, dto.userId),
-        )
+        .where(eq(sessionTable.userId, dto.userId))
       return true
-    }
-    catch (err) {
+    } catch (err) {
       console.error(err)
       return false
     }
   },
 
-  async terminate(sessionId: string, tx?: DatabaseTransaction): Promise<boolean> {
+  async terminate(
+    sessionId: string,
+    tx?: DatabaseTransaction,
+  ): Promise<boolean> {
     try {
       const db = SelectDatabaseAdapter(database, tx)
       await db
@@ -109,14 +131,11 @@ export const SessionRepo = {
         .set({
           status: SessionStatus.TERMINATED,
         })
-        .where(
-          eq(sessionTable.id, sessionId),
-        )
+        .where(eq(sessionTable.id, sessionId))
       return true
-    }
-    catch (err) {
+    } catch (err) {
       console.error(err)
       return false
     }
-  }
+  },
 }

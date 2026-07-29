@@ -1,6 +1,10 @@
 import { sql } from 'drizzle-orm'
 import { integer, text } from 'drizzle-orm/sqlite-core'
-import { db, type DatabaseAdapter, type DatabaseTransaction } from '~/server/database/client'
+import {
+  db,
+  type DatabaseAdapter,
+  type DatabaseTransaction,
+} from '~/server/database/client'
 
 export const id = () =>
   text('id')
@@ -12,7 +16,6 @@ export const timestamp = (field: string, defaultNow: boolean = false) =>
 
 export const boolean = (field: string) =>
   integer(field, { mode: 'boolean' })
-
 
 export function SelectDatabaseAdapter(
   db: DatabaseAdapter,
@@ -29,7 +32,7 @@ export function completeWithTransaction<T>(
     return func(tx)
   }
 
-  return db.transaction(async trx => {
+  return db.transaction(async (trx) => {
     return func(trx)
   })
 }

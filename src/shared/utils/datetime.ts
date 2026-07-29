@@ -11,9 +11,7 @@ export type TimeUnit =
   | 'mo' // months, approx 30 days
   | 'y' // years, approx 365 days
 
-
 export type TimeUnitKey = `${number}${TimeUnit}`
-
 
 export const UNIT_TO_MS: Record<TimeUnit, number> = {
   ms: 1,
@@ -42,7 +40,6 @@ export function parseDurationToMs(duration: TimeUnitKey): number {
 
   return value * UNIT_TO_MS[unit]
 }
-
 
 export function getExpiresAt(ttl: TimeUnitKey, now?: Date) {
   const nowDate = now ? now : new Date()

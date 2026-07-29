@@ -30,17 +30,12 @@ const signUpDto = z
       .string()
       .min(8, 'Password must contain at least 8 characters'),
 
-    repeatPassword: z
-      .string()
-      .min(1, 'Repeat the password'),
+    repeatPassword: z.string().min(1, 'Repeat the password'),
   })
-  .refine(
-    data => data.password === data.repeatPassword,
-    {
-      path: ['repeatPassword'],
-      message: 'Passwords do not match',
-    },
-  )
+  .refine((data) => data.password === data.repeatPassword, {
+    path: ['repeatPassword'],
+    message: 'Passwords do not match',
+  })
 
 const formData = ref({
   username: {
@@ -115,10 +110,7 @@ async function submit(): Promise<void> {
       return
     }
 
-    const {
-      repeatPassword: _repeatPassword,
-      ...payload
-    } = result.data
+    const { repeatPassword: _repeatPassword, ...payload } = result.data
 
     const { data } = await AuthApi.signUp(payload)
     if (!data?.success) {
@@ -136,43 +128,81 @@ async function submit(): Promise<void> {
 </script>
 
 <template>
-  <section class="mx-auto w-[360px] h-full flex items-center justify-center py-10">
+  <section
+    class="mx-auto w-[360px] h-full flex items-center justify-center py-10"
+  >
     <article class="overlay-card">
       <Transition name="content-switch" mode="out-in">
-        <form v-if="!isRegistered" key="signup-form"
-          class="w-[360px] min-h-[720px] flex flex-col px-[24px] py-[12px] gap-[28px]" @submit.prevent="submit">
-          <h1 class="text-[36px] ml-auto">
-            Sign Up
-          </h1>
+        <form
+          v-if="!isRegistered"
+          key="signup-form"
+          class="w-[360px] min-h-[720px] flex flex-col px-[24px] py-[12px] gap-[28px]"
+          @submit.prevent="submit"
+        >
+          <h1 class="text-[36px] ml-auto">Sign Up</h1>
 
-          <InputUI v-model="formData.username.value" placeholder="Username" size="large" type="text" label="Username"
-            :error="formData.username.error" @input="undoError('username')" />
+          <InputUI
+            v-model="formData.username.value"
+            placeholder="Username"
+            size="large"
+            type="text"
+            label="Username"
+            :error="formData.username.error"
+            @input="undoError('username')"
+          />
 
-          <InputUI v-model="formData.password.value" type="password" autocomplete="new-password" placeholder="Password"
-            size="large" label="Password" :error="formData.password.error" @input="undoError('password')" />
+          <InputUI
+            v-model="formData.password.value"
+            type="password"
+            autocomplete="new-password"
+            placeholder="Password"
+            size="large"
+            label="Password"
+            :error="formData.password.error"
+            @input="undoError('password')"
+          />
 
-          <InputUI v-model="formData.repeatPassword.value" type="password" autocomplete="new-password"
-            placeholder="Repeat password" size="large" label="Repeat password" :error="formData.repeatPassword.error"
-            @input="undoError('repeatPassword')" />
+          <InputUI
+            v-model="formData.repeatPassword.value"
+            type="password"
+            autocomplete="new-password"
+            placeholder="Repeat password"
+            size="large"
+            label="Repeat password"
+            :error="formData.repeatPassword.error"
+            @input="undoError('repeatPassword')"
+          />
 
           <div class="w-full flex justify-center mt-auto mb-[24px]">
-            <ButtonUI type="submit" class="w-[50%]" :disabled="isLoading" :size="'large'">
+            <ButtonUI
+              type="submit"
+              class="w-[50%]"
+              :disabled="isLoading"
+              :size="'large'"
+            >
               {{ isLoading ? 'Loading...' : 'Submit' }}
             </ButtonUI>
           </div>
         </form>
 
-        <div v-else key="success-message"
-          class="w-[360px] min-h-[420px] flex flex-col items-center justify-center gap-[32px] px-[32px] py-[40px]">
-          <h1 class="text-[36px]">
-            Success
-          </h1>
+        <div
+          v-else
+          key="success-message"
+          class="w-[360px] min-h-[420px] flex flex-col items-center justify-center gap-[32px] px-[32px] py-[40px]"
+        >
+          <h1 class="text-[36px]">Success</h1>
 
           <p class="text-center text-[18px] leading-[1.6]">
-            Вы успешно зарегистрировали аккаунт, далее выполните вход в систему.
+            Вы успешно зарегистрировали аккаунт, далее выполните вход в
+            систему.
           </p>
 
-          <ButtonUI type="button" class="w-[50%] mx-auto!" :size="'large'" @click="goToSignIn">
+          <ButtonUI
+            type="button"
+            class="w-[50%] mx-auto!"
+            :size="'large'"
+            @click="goToSignIn"
+          >
             Sign In
           </ButtonUI>
         </div>

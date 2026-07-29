@@ -11,7 +11,10 @@ export const BaseCheckUpMiddleware = defineMiddleware(
     logger.info('', { pathname })
 
     // Переход на страницу входа
-    if (pathname === clientRoutes.Auth && !pathname.startsWith(clientRoutes.SignIn)) {
+    if (
+      pathname === clientRoutes.Auth &&
+      !pathname.startsWith(clientRoutes.SignIn)
+    ) {
       logger.info('move to ' + clientRoutes.SignIn)
       return ctx.redirect(clientRoutes.SignIn)
     }

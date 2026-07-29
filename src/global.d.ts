@@ -28,8 +28,7 @@ declare global {
   }
 }
 
-declare module '@jamescoyle/vue-icon' { }
-
+declare module '@jamescoyle/vue-icon' {}
 
 /// <reference types="astro/client" />
 

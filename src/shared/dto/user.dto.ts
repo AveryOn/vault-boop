@@ -10,11 +10,7 @@ export type UserInput = typeof userTable.$inferInsert
  * * `masterPasswordHash`
  * * `username`
  */
-export type UserSafety = Omit<
-  User,
-  'masterPasswordHash' | 'username'
->
-
+export type UserSafety = Omit<User, 'masterPasswordHash' | 'username'>
 
 export const createUserDto = z.object({
   username: z.string().trim().min(3),

@@ -1,23 +1,20 @@
-import { ActionKey } from "~/shared/dto/action.dto"
-import { db } from "~/server/database/client"
-import { actionTable } from "~/server/database/schema"
-import { dateISO } from "~/shared/utils/datetime"
+import { ActionKey } from '~/shared/dto/action.dto'
+import { db } from '~/server/database/client'
+import { actionTable } from '~/server/database/schema'
+import { dateISO } from '~/shared/utils/datetime'
 
 async function seedActions(): Promise<void> {
   const now = dateISO()
 
-  const actions = Object.values(ActionKey).map(name => ({
+  const actions = Object.values(ActionKey).map((name) => ({
     name,
     createdAt: now,
     updatedAt: now,
   }))
 
-  await db
-    .insert(actionTable)
-    .values(actions)
-    .onConflictDoNothing({
-      target: actionTable.name,
-    })
+  await db.insert(actionTable).values(actions).onConflictDoNothing({
+    target: actionTable.name,
+  })
 
   console.log(`Seeded ${actions.length} actions`)
 }

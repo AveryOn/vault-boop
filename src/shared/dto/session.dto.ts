@@ -10,7 +10,7 @@ export const createSessionDto = z.object({
   userId: z.uuid(),
   ip: z.ipv4(),
   deviceId: z.uuid(),
-  ua: z.string()
+  ua: z.string(),
 })
 export type CreateSessionDto = z.infer<typeof createSessionDto>
 export type CreateSessionResponse = Session
@@ -25,12 +25,12 @@ export const updateSessionDto = z.object({
 export type UpdateSessionDto = z.infer<typeof updateSessionDto>
 export type UpdateSessionResponse = Session
 
-
 export const terminateAllSessionsDto = z.object({
   userId: z.uuid(),
 })
-export type TerminateAllSessionsDto = z.infer<typeof terminateAllSessionsDto>
-
+export type TerminateAllSessionsDto = z.infer<
+  typeof terminateAllSessionsDto
+>
 
 export const getSessionByStatus = z.object({
   userId: z.uuid(),

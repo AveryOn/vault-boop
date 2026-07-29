@@ -1,16 +1,15 @@
-<script setup lang="ts">
-
-</script>
+<script setup lang="ts"></script>
 
 <template>
-  <section class="mx-auto w-[360px] h-full flex items-center justify-center py-10">
+  <section
+    class="mx-auto w-[360px] h-full flex items-center justify-center py-10"
+  >
     <article class="overlay-card">
-      <div class="w-[360px] min-h-[720px] flex flex-col px-[24px] py-[12px] gap-[28px]">
-        <h1 class="text-[36px] ml-auto">
-          Vault
-        </h1>
+      <div
+        class="w-[360px] min-h-[720px] flex flex-col px-[24px] py-[12px] gap-[28px]"
+      >
+        <h1 class="text-[36px] ml-auto">Vault</h1>
       </div>
-
     </article>
   </section>
 </template>
