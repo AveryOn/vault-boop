@@ -35,8 +35,9 @@ import { AuthService } from '../services/auth.service'
 //   return ctx.redirect(clientRoutes.SignIn)
 // }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
 type MiddlewareCtx = APIContext<
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   Record<string, any>,
   Record<string, string | undefined>
 >
@@ -144,7 +145,7 @@ async function validationContext(
 /**
  * Сбрасывает куки безопасности
  */
-function resetSecureCookies() {}
+function resetSecureCookies() { }
 
 export const AuthCheckMiddleware = defineMiddleware(
   async (ctx, next) => {
